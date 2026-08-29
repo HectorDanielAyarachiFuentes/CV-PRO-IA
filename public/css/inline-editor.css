@@ -1,4 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 /* INLINE EDITOR TOOLBAR (Fullscreen)                                         */
 /* -------------------------------------------------------------------------- */
 #inline-editor-toolbar {
@@ -314,28 +314,4 @@
 /* Indicador de avatar clickeable en fullscreen */
 .fullscreen-preview .cv-avatar-clickable {
     cursor: pointer;
-    position: relative;
 }
-
-.fullscreen-preview .cv-avatar-clickable::after {
-    content: 'âœï¸';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 50%;
-    font-size: 0.75rem;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.fullscreen-preview .cv-avatar-clickable:hover::after {
-    opacity: 1;
-}
-
