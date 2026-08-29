@@ -1,4 +1,4 @@
-﻿/* --- Panel de Vista Previa (Derecha) --- */
+/* --- Panel de Vista Previa (Derecha) --- */
 .preview-panel {
     position: relative;
     overflow-y: auto;
@@ -247,6 +247,33 @@ body.fullscreen-preview:not(.read-only-mode) .editor-panel {
 
     #cv-template {
         font-size: 10pt;
+    }
+
+    /* Ocultar barras de scroll en el PDF */
+    ::-webkit-scrollbar {
+        display: none !important;
+    }
+    * {
+        scrollbar-width: none !important;
+    }
+
+    /* Evitar cortes feos entre páginas */
+    .cv-section, 
+    .experience-item, 
+    .education-item, 
+    .portfolio-item,
+    .skill-category,
+    .impact-item,
+    .header-content,
+    .sidebar,
+    .main-content {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
 }
 

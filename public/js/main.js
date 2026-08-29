@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalTitle = document.title;
             const firstName = state.cvData.personalInfo.firstName || 'CV';
             const lastName = state.cvData.personalInfo.lastName || 'Profesional';
-            const newTitle = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')} `;
+            const newTitle = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}`;
             document.title = newTitle;
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 500);
