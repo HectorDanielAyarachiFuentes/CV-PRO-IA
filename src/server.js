@@ -8,29 +8,6 @@ require('dotenv').config(); // Carga la clave desde el archivo .env
 const app = express();
 const port = 3000;
 
-// Agente Capacitaciones
-const instruccionesCapacitaciones = fs.readFileSync(path.join(__dirname, '../Asistente_Inscripciones/instrucciones_asistente.txt'), 'utf-8');
-const conocimientoCapacitaciones = fs.readFileSync(path.join(__dirname, '../Asistente_Inscripciones/conocimiento.txt'), 'utf-8');
-const systemPromptCapacitaciones = `
-${instruccionesCapacitaciones}
-
---- BASE DE CONOCIMIENTO (FUENTES) ---
-Utiliza la siguiente información para responder a las consultas:
-
-${conocimientoCapacitaciones}
-`;
-
-// Agente Curzas
-const instruccionesCurzas = fs.readFileSync(path.join(__dirname, '../Asistente_Curzas/instrucciones_curzas.txt'), 'utf-8');
-const conocimientoCurzas = fs.readFileSync(path.join(__dirname, '../Asistente_Curzas/conocimiento.txt'), 'utf-8');
-const systemPromptCurzas = `
-${instruccionesCurzas}
-
---- BASE DE CONOCIMIENTO (FUENTES) ---
-Utiliza la siguiente información para responder a las consultas:
-
-${conocimientoCurzas}
-`;
 
 // Middleware para que el servidor entienda JSON y sirva tu index.html
 app.use(express.json());
@@ -52,29 +29,7 @@ app.post('/api/chat', async (req, res) => {
         
         let messages = [];
 
-        if (mode === 'capacitaciones') {
-            const systemPrompt = systemPromptCapacitaciones;
-            messages = [
-                { role: "system", content: systemPrompt },
-                ...history,
-                { role: "user", content: question }
-            ];
-        } else if (mode === 'curzas') {
-            const systemPrompt = systemPromptCurzas;
-            messages = [
-                { role: "system", content: systemPrompt },
-                ...history,
-                { role: "user", content: question }
-            ];
-        } else if (mode === 'practica3') {
-            const systemPrompt = systemPromptCapacitaciones;
-            const contextText = context ? `\n\n--- DOCUMENTO ADJUNTO POR EL USUARIO ---\n${context}\n---------------------------------------\n` : "";
-            messages = [
-                { role: "system", content: systemPrompt },
-                ...history,
-                { role: "user", content: question + contextText }
-            ];
-        } else if (mode === 'cv-generator') {
+        if (mode === 'cv-generator') {
             const cvActualContexto = currentCv ? `\n--- ESTADO ACTUAL DEL CV ---\n${JSON.stringify(currentCv)}\n----------------------------\n` : "";
             
             const systemPrompt = `Eres un asistente experto en Recursos Humanos diseñado para ayudar al usuario a crear o modificar su currículum profesional.
