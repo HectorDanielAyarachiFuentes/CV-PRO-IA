@@ -61,12 +61,36 @@
     font-size: 1.1rem;
 }
 
-.ai-chat-close {
+.ai-chat-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.ai-chat-header-btn {
     background: none;
     border: none;
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.ai-chat-header-btn:hover {
+    opacity: 0.8;
+}
+
+/* Expanded state for the chat window */
+.ai-chat-window.expanded {
+    width: 450px;
+    height: calc(100vh - 120px);
+    bottom: 100px;
+}
+
+@media (max-width: 768px) {
+    .ai-chat-window.expanded {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 120px);
+    }
 }
 
 .ai-chat-messages {
@@ -125,6 +149,25 @@
     margin-top: 0;
 }
 .ai-msg strong {
+    font-weight: 600;
+}
+
+/* Estilos para Tablas en Markdown */
+.ai-msg table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.ai-msg th, .ai-msg td {
+    border: 1px solid var(--color-border, #e5e7eb);
+    padding: 6px 10px;
+    text-align: left;
+}
+.ai-msg th {
+    background-color: var(--bg-color-alt, #f9fafb);
     font-weight: 600;
 }
 

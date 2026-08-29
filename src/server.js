@@ -43,7 +43,8 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
     "personal": { "firstName": "", "lastName": "", "jobTitle": "", "email": "", "phone": "", "address": "", "summary": "" },
     "experience": [ { "id": "exp-1", "position": "", "company": "", "startDate": "", "endDate": "", "description": "" } ],
     "education": [ { "id": "edu-1", "degree": "", "institution": "", "startDate": "", "endDate": "", "description": "" } ],
-    "skills": [ { "id": "skill-1", "name": "", "level": "advanced" } ]
+    "skills": [ { "id": "skill-1", "name": "", "level": "advanced" } ],
+    "design": { "themeColor": "", "textColorDark": "", "textColorMuted": "", "sectionTitleColor": "" }
   }
 }
 Asegúrate de conservar en el JSON final cualquier dato que ya existiera en el 'ESTADO ACTUAL DEL CV' si el usuario no pidió borrarlo.

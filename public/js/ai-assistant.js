@@ -6,7 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('ai-chat-input');
     const sendBtn = document.getElementById('ai-chat-send');
 
+    const expandBtn = document.getElementById('ai-chat-expand');
+    
+    // Load from local storage
     let chatHistory = [];
+    try {
+        const savedHistory = localStorage.getItem('aiChatHistory');
+        if (savedHistory) {
+            chatHistory = JSON.parse(savedHistory);
+            if (chatHistory.length > 0) {
+                chatMessages.innerHTML = ''; // Clear default welcome message
+                chatHistory.forEach(msg => {
+                    const sender = msg.role === 'user' ? 'user' : 'ai';
+                    addMessage(msg.content, sender);
+                });
+            }
+        }
+    } catch(e) {
+        console.error("Error loading chat history", e);
+    }
 
     toggleBtn.addEventListener('click', () => {
         chatWindow.classList.toggle('hidden');
@@ -18,6 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBtn.addEventListener('click', () => {
         chatWindow.classList.add('hidden');
     });
+
+    if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+            chatWindow.classList.toggle('expanded');
+        });
+    }
 
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
@@ -81,7 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const parsed = JSON.parse(cleanResponse);
                 if (parsed.isJson && parsed.data) {
-                    addMessage('¡He generado tu CV con los datos proporcionados! Revisa la vista previa.', 'ai');
+                    const successMsg = '¡He generado tu CV con los datos proporcionados! Revisa la vista previa.';
+                    addMessage(successMsg, 'ai');
+                    chatHistory.push({ role: 'user', content: text });
+                    chatHistory.push({ role: 'assistant', content: successMsg });
+                    localStorage.setItem('aiChatHistory', JSON.stringify(chatHistory));
                     
                     // Update CV state
                     const newCvData = parsed.data;
@@ -99,6 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(newCvData.skills && Array.isArray(newCvData.skills)) {
                         currentData.skills = newCvData.skills;
                     }
+                    if(newCvData.design) {
+                        if (newCvData.design.themeColor) currentData.themeColor = newCvData.design.themeColor;
+                        if (newCvData.design.textColorDark) currentData.textColorDark = newCvData.design.textColorDark;
+                        if (newCvData.design.textColorMuted) currentData.textColorMuted = newCvData.design.textColorMuted;
+                        if (newCvData.design.sectionTitleColor !== undefined) currentData.sectionTitleColor = newCvData.design.sectionTitleColor;
+                    }
                     
                     // Assign new state
                     window.CvApp.state.cvData = currentData;
@@ -106,6 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Force UI update
                     if (typeof window.CvApp.updateAndRender === 'function') {
                         window.CvApp.updateAndRender();
+                        if (typeof window.CvApp.setActiveSection === 'function') {
+                            const lastSec = localStorage.getItem('cvProLastSection') || 'welcome';
+                            window.CvApp.setActiveSection(lastSec);
+                        }
                     } else {
                         if (typeof window.CvApp.renderCVPreview === 'function') {
                             window.CvApp.renderCVPreview();
@@ -126,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMessage(aiResponse, 'ai');
                 chatHistory.push({ role: 'user', content: text });
                 chatHistory.push({ role: 'assistant', content: aiResponse });
+                localStorage.setItem('aiChatHistory', JSON.stringify(chatHistory));
             }
 
         } catch (error) {
