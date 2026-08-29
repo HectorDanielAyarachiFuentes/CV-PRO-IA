@@ -154,7 +154,6 @@
         const avatarPanelApplyBtn = document.getElementById('avatar-panel-apply-btn');
         const avatarPanelTabs = avatarEditorPanel.querySelectorAll('.avatar-panel-tab');
         const avatarPanelContents = avatarEditorPanel.querySelectorAll('.avatar-panel-content');
-        const loadedIcons = CvApp.state.loadedIcons;
 
         avatarPanelCloseBtnEl.addEventListener('click', hideAvatarPanel);
 
@@ -182,9 +181,10 @@
         const populateAvatarIconGrid = () => {
             const grid = document.getElementById('avatar-panel-icon-grid');
             const cvData = CvApp.state.cvData;
-            if (!grid || !loadedIcons.length) return;
+            const iconsList = CvApp.state.loadedIcons;
+            if (!grid || !iconsList || !iconsList.length) return;
             grid.innerHTML = '';
-            loadedIcons.forEach(iconPath => {
+            iconsList.forEach(iconPath => {
                 const btn = document.createElement('div');
                 btn.className = 'avatar-panel-icon-option';
                 btn.dataset.iconPath = iconPath;
