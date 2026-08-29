@@ -1,26 +1,32 @@
 ---
-description: Reglas de arquitectura, estructura del proyecto y directrices de modificación para Tu-CV-Pro-Edition.
+description: Reglas de arquitectura, estructura del proyecto y directrices de modificación para Cv Pro Ia.
 ---
 
-# Guía de Arquitectura (Tu-CV-Pro-Edition)
+# Guía de Arquitectura (Cv Pro Ia)
 
-Este proyecto es un generador/editor de currículums (CV). Está construido con HTML, CSS vainilla y JavaScript modular, optimizado para rendimiento.
+Este proyecto es un generador/editor de currículums (CV) asistido por Inteligencia Artificial. Está construido con HTML, CSS vainilla, JavaScript modular en el frontend, y un servidor Node.js/Express en el backend.
 
 ## 📂 Estructura de Directorios y Archivos
 
 ### 📄 Raíz
+- `package.json`: Dependencias del backend (Express, dotenv, multer, pdf-parse, mammoth).
+- `.env`: Configuración y claves de API de IA (ej. Groq, OpenAI).
+- `README.md`: Documentación principal.
+
+### 🌐 `public/` (Frontend)
 - `index.html`: Punto de entrada principal. Estructura base de la UI.
 
-### 🎨 `css/` (Estilos Modulares)
+#### 🎨 `public/css/` (Estilos Modulares)
 - `base.css`: Variables CSS, reseteos.
 - `layout.css`: Estructura general (grid, flexbox).
 - `forms.css`: Estilos de formularios.
 - `inline-editor.css`: Estilos para la edición en vista previa.
 - `modals-toasts.css`: Modales y notificaciones.
 - `preview.css`: Previsualización del CV.
+- `ai-assistant.css`: Estilos de la interfaz de chat con IA.
 - `dark-theme.css`: Modo oscuro.
 
-### ⚙️ `js/` (Lógica Modular)
+#### ⚙️ `public/js/` (Lógica Modular)
 - `main.js`: Orquestador principal e inicialización.
 - `state.js`: Estado global (datos del CV).
 - `history.js`: Deshacer/Rehacer (Undo/Redo).
@@ -31,17 +37,19 @@ Este proyecto es un generador/editor de currículums (CV). Está construido con 
 - `templateHelpers.js`: Helpers para inyectar datos en plantillas.
 - `uiUtils.js`: Utilidades UI (modales, toasts).
 - `validators.js`: Validación de datos.
+- `ai-assistant.js`: Lógica del chatbot y comunicación con la API.
 
-### 🗂️ `data/` (Datos y Plantillas)
+#### 🗂️ `public/data/` (Datos y Plantillas)
 - `html/` y `typst/`: Plantillas base para los CVs.
 - `icon.json` / `svg-cache.json`: Iconos vectoriales.
 - `gradients/`: Gradientes UI/plantillas.
 
-### 🖼️ `assets/`
-- Recursos estáticos (imágenes, logos).
+### 🖥️ `src/` (Backend)
+- `server.js`: Servidor Express. Maneja la comunicación con la API de LLMs (Groq), rotación de claves, y procesamiento de carga de archivos (PDF/Word para importación de CVs).
 
 ## 🛠️ Reglas de Modificación (CRÍTICO)
 1. **Separación de Intereses**: Mantén la lógica UI en `uiUtils.js`, el estado en `state.js`, y el renderizado en `formRenderers.js`.
-2. **CSS Modulares**: No mezcles estilos ni crees estilos globales fuera de `base.css`. Usa siempre las variables definidas en `base.css`.
-3. **Eficiencia**: Mantén el código limpio, optimizado para tokens y no repitas código.
-4. **Mantenimiento de esta regla**: Si modificas la estructura principal de carpetas o archivos, DEBES actualizar este archivo de reglas (`.agents/rules/architecture.md`) inmediatamente.
+2. **Backend**: Todo procesamiento de archivos (archivos locales, parseo de PDF) o llamadas a APIs secretas DEBE hacerse en `server.js`.
+3. **CSS Modulares**: No mezcles estilos ni crees estilos globales fuera de `base.css`. Usa siempre las variables definidas en `base.css`.
+4. **Eficiencia**: Mantén el código limpio, optimizado para tokens y no repitas código.
+5. **Mantenimiento de esta regla**: Si modificas la estructura principal de carpetas o archivos, DEBES actualizar este archivo de reglas (`public/.agents/rules/architecture.md`) inmediatamente.

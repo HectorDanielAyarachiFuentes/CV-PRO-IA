@@ -1,19 +1,21 @@
 {
-  "name": "ai-pdf",
+  "name": "cv-pro-ia",
   "version": "1.0.0",
-  "description": "Un asistente de IA para chatear con documentos PDF.",
+  "description": "Un asistente de IA para crear y mejorar tu currículum profesional.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HectorDanielAyarachiFuentes/AI-PDF.git"
+    "url": "git+https://github.com/HectorDanielAyarachiFuentes/CV-PRO-IA.git"
   },
   "keywords": [
-    "pdf",
+    "cv",
+    "resume",
     "ai",
-    "assistant"
+    "assistant",
+    "pdf"
   ],
   "author": "HectorDanielAyarachiFuentes",
   "license": "ISC",
