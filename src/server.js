@@ -17,11 +17,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.post('/api/chat', async (req, res) => {
     try {
         const { question, context, mode, history = [], currentCv = null } = req.body;
-        // El servidor lee las claves secretas aquí
-        const groqApiKeys = [
-            process.env.GROQ_API_KEY,
-            process.env.GROQ_API_KEY_2
-        ].filter(key => key); // Filtramos por si alguna está vacía
+        // El servidor lee TODAS las claves secretas que empiecen con GROQ_API_KEY
+        const groqApiKeys = Object.keys(process.env)
+            .filter(key => key.startsWith('GROQ_API_KEY'))
+            .map(key => process.env[key])
+            .filter(key => key); // Filtramos por si alguna está vacía
 
         if (groqApiKeys.length === 0) {
             return res.status(500).json({ error: 'No hay claves de API configuradas en el servidor.' });
