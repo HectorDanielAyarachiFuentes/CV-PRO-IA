@@ -179,6 +179,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(newCvData.skills && Array.isArray(newCvData.skills)) {
                         currentData.skills = newCvData.skills;
                     }
+                    if(newCvData.impacts && Array.isArray(newCvData.impacts)) {
+                        currentData.impacts = newCvData.impacts;
+                    }
+                    if(newCvData.portfolio && Array.isArray(newCvData.portfolio)) {
+                        currentData.portfolio = newCvData.portfolio;
+                    }
+                    if(newCvData.footer && Array.isArray(newCvData.footer)) {
+                        currentData.footer = newCvData.footer;
+                    }
                     if(newCvData.design) {
                         if (newCvData.design.themeColor) currentData.themeColor = newCvData.design.themeColor;
                         if (newCvData.design.textColorDark) currentData.textColorDark = newCvData.design.textColorDark;

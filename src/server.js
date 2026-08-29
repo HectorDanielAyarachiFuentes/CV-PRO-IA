@@ -44,10 +44,13 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
     "experience": [ { "id": "exp-1", "position": "", "company": "", "startDate": "", "endDate": "", "description": "" } ],
     "education": [ { "id": "edu-1", "degree": "", "institution": "", "startDate": "", "endDate": "", "description": "" } ],
     "skills": [ { "id": "skill-1", "name": "", "level": "advanced" } ],
+    "impacts": [ { "id": "imp-1", "description": "" } ],
+    "portfolio": [ { "id": "port-1", "title": "", "img": "" } ],
+    "footer": [ { "id": "foot-1", "type": "text", "label": "", "value": "" } ],
     "design": { "themeColor": "", "textColorDark": "", "textColorMuted": "", "sectionTitleColor": "" }
   }
 }
-Asegúrate de conservar en el JSON final cualquier dato que ya existiera en el 'ESTADO ACTUAL DEL CV' si el usuario no pidió borrarlo.
+Asegúrate de conservar en el JSON final cualquier dato que ya existiera en el 'ESTADO ACTUAL DEL CV' si el usuario no pidió borrarlo. Sin embargo, si estás extrayendo datos de un documento nuevo proporcionado por el usuario, DEBES enviar arreglos vacíos [] para impacts, portfolio, footer y cualquier otra lista si la información no está presente en el documento, para que se borren los datos de ejemplo.
 Si aún estás recolectando información y no es momento de actualizar el documento, responde de manera normal y conversacional en texto plano.${cvActualContexto}`;
             
             messages = [
