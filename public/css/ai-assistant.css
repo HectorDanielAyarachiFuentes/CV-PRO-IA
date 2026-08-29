@@ -125,3 +125,10 @@
     padding: 10px 15px;
     border-radius: 6px;
 }
+
+/* Ocultar el widget de chat al imprimir/descargar PDF */
+@media print {
+    .ai-chat-widget {
+        display: none !important;
+    }
+}
