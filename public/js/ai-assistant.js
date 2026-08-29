@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `ai-msg ${sender}`;
-        msgDiv.textContent = text;
+        
+        if (sender === 'ai' && typeof marked !== 'undefined') {
+            msgDiv.innerHTML = marked.parse(text);
+        } else {
+            msgDiv.textContent = text;
+        }
+        
         chatMessages.appendChild(msgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }

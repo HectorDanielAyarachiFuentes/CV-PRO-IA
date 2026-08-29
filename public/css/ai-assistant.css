@@ -103,6 +103,31 @@
     border-bottom-right-radius: 2px;
 }
 
+/* Estilos para Markdown dentro de los mensajes de IA */
+.ai-msg p {
+    margin: 0 0 0.5rem 0;
+}
+.ai-msg p:last-child {
+    margin-bottom: 0;
+}
+.ai-msg ul, .ai-msg ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+.ai-msg li {
+    margin-bottom: 0.25rem;
+}
+.ai-msg h1, .ai-msg h2, .ai-msg h3, .ai-msg h4, .ai-msg h5, .ai-msg h6 {
+    margin: 1rem 0 0.5rem 0;
+    font-size: 1.05rem;
+}
+.ai-msg h1:first-child, .ai-msg h2:first-child, .ai-msg h3:first-child, .ai-msg h4:first-child, .ai-msg h5:first-child, .ai-msg h6:first-child {
+    margin-top: 0;
+}
+.ai-msg strong {
+    font-weight: 600;
+}
+
 .ai-chat-input-area {
     padding: 15px;
     border-top: 1px solid var(--color-border, #e5e7eb);
