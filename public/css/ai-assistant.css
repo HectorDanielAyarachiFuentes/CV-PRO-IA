@@ -176,7 +176,24 @@
     border-top: 1px solid var(--color-border, #e5e7eb);
     display: flex;
     gap: 10px;
+    align-items: center;
     background: var(--bg-color, #ffffff);
+}
+
+.ai-attach-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-muted-text, #6c757d);
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.ai-attach-btn:hover {
+    color: var(--primary-accent, #2563eb);
 }
 
 #ai-chat-input {

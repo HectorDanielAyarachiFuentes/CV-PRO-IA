@@ -126,8 +126,50 @@ Si aún estás recolectando información y no es momento de actualizar el docume
         res.status(500).json({ error: error.message });
     }
 });
+const multer = require('multer');
+const pdfParse = require('pdf-parse');
+const mammoth = require('mammoth');
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post('/api/upload-cv', upload.single('cvFile'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+        }
+
+        let text = '';
+        const fileBuffer = req.file.buffer;
+        const mimeType = req.file.mimetype;
+        const originalName = req.file.originalname.toLowerCase();
+
+        if (mimeType === 'application/pdf' || originalName.endsWith('.pdf')) {
+            const data = await pdfParse(fileBuffer);
+            text = data.text;
+        } else if (
+            mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+            mimeType === 'application/msword' || 
+            originalName.endsWith('.docx') || originalName.endsWith('.doc')
+        ) {
+            // For older .doc files mammoth might not work perfectly, but it covers .docx well
+            const result = await mammoth.extractRawText({ buffer: fileBuffer });
+            text = result.value;
+        } else {
+            return res.status(400).json({ error: 'Formato de archivo no soportado. Por favor sube un PDF o Word.' });
+        }
+
+        if (!text || text.trim() === '') {
+            return res.status(400).json({ error: 'No se pudo extraer texto del archivo.' });
+        }
+
+        res.json({ text: text.trim() });
+    } catch (error) {
+        console.error("Error procesando archivo:", error);
+        res.status(500).json({ error: 'Error al procesar el archivo CV.' });
+    }
+});
 
 // El servidor se pone a escuchar peticiones
 app.listen(port, () => {
     console.log(`Servidor de prueba iniciado en http://localhost:${port}`);
-});
+});

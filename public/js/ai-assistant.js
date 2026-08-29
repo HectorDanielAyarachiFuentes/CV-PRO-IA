@@ -43,6 +43,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const attachBtn = document.getElementById('ai-chat-attach-btn');
+    const fileInput = document.getElementById('ai-chat-file');
+
+    if (attachBtn && fileInput) {
+        attachBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            addMessage(`Subiendo archivo: ${file.name}...`, 'user');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-msg ai typing';
+            typingDiv.textContent = 'Procesando documento...';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const formData = new FormData();
+            formData.append('cvFile', file);
+
+            try {
+                const response = await fetch('/api/upload-cv', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                chatMessages.removeChild(typingDiv);
+
+                if (result.error) {
+                    addMessage('Error: ' + result.error, 'ai');
+                    return;
+                }
+
+                addMessage('¡Documento procesado! Ahora extraeré la información para tu CV...', 'ai');
+
+                // Send hidden prompt to AI with the extracted text
+                chatInput.value = `He subido un archivo con mi CV. Extrae la información y genera mi CV manteniendo todos los datos en los campos correspondientes. Aquí está el contenido:\n\n${result.text}`;
+                await sendMessage();
+                
+            } catch (error) {
+                chatMessages.removeChild(typingDiv);
+                addMessage('Error al procesar el archivo: ' + error.message, 'ai');
+            }
+            
+            fileInput.value = ''; // Reset input
+        });
+    }
+
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `ai-msg ${sender}`;
