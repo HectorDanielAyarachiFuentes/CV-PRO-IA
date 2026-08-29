@@ -40,7 +40,7 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
 {
   "isJson": true,
   "data": {
-    "personal": { "firstName": "", "lastName": "", "jobTitle": "", "email": "", "phone": "", "address": "", "summary": "" },
+    "personal": { "firstName": "", "lastName": "", "title": "", "email": "", "phone": "", "address": "", "summary": "" },
     "experience": [ { "id": "exp-1", "position": "", "company": "", "startDate": "", "endDate": "", "description": "" } ],
     "education": [ { "id": "edu-1", "degree": "", "institution": "", "startDate": "", "endDate": "", "description": "" } ],
     "skills": [ { "id": "skill-1", "name": "", "level": "advanced" } ],
@@ -127,7 +127,7 @@ Si aún estás recolectando información y no es momento de actualizar el docume
     }
 });
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
+
 const mammoth = require('mammoth');
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -144,8 +144,9 @@ app.post('/api/upload-cv', upload.single('cvFile'), async (req, res) => {
         const originalName = req.file.originalname.toLowerCase();
 
         if (mimeType === 'application/pdf' || originalName.endsWith('.pdf')) {
-            const data = await pdfParse(fileBuffer);
-            text = data.text;
+            const { extractText } = await import('unpdf');
+            const data = await extractText(new Uint8Array(fileBuffer));
+            text = Array.isArray(data.text) ? data.text.join('\n') : data.text;
         } else if (
             mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
             mimeType === 'application/msword' || 
