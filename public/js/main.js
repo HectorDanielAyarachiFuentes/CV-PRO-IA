@@ -592,6 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
             CvApp.loadGradientPresets(),
             CvApp.loadIcons()
         ]).then(() => {
+            renderCVPreview();
             const currentSection = localStorage.getItem('cvProLastSection');
             if (currentSection === 'design' || currentSection === 'avatar') {
                 setActiveSection(currentSection);
