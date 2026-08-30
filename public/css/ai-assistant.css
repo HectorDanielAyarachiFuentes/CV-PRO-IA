@@ -59,6 +59,17 @@
 .ai-chat-header h3 {
     margin: 0;
     font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-header-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    display: inline-block;
 }
 
 .ai-chat-header-actions {
