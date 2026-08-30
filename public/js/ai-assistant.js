@@ -48,14 +48,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Limpiar historial de chat
+    // Limpiar historial de chat con modal personalizado
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            if (confirm('¿Deseas reiniciar la conversación con el asistente?')) {
+            const doReset = () => {
                 chatHistory = [];
                 localStorage.removeItem('aiChatHistory');
                 chatMessages.innerHTML = '';
                 addMessage(INITIAL_GREETING, 'ai');
+                if (typeof window.CvApp !== 'undefined' && typeof window.CvApp.showToast === 'function') {
+                    window.CvApp.showToast('Conversación reiniciada con éxito', 'success');
+                }
+            };
+
+            if (typeof window.CvApp !== 'undefined' && typeof window.CvApp.showModal === 'function') {
+                window.CvApp.showModal(
+                    '¿Reiniciar conversación?',
+                    'Se vaciará el historial de preguntas y respuestas con el asistente para que puedas comenzar de cero.',
+                    'danger',
+                    (confirmed) => {
+                        if (confirmed) doReset();
+                    },
+                    { confirmText: 'Reiniciar Chat', cancelText: 'Cancelar' }
+                );
+            } else {
+                doReset();
             }
         });
     }

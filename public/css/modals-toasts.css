@@ -207,15 +207,16 @@
 .custom-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
+    background-color: rgba(15, 23, 42, 0.65);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 10001;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .custom-modal-overlay.show {
@@ -224,56 +225,134 @@
 }
 
 .custom-modal {
-    background-color: var(--bg-color, #fff);
-    border-radius: 12px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    background: var(--bg-color, #ffffff);
+    border-radius: 16px;
+    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
     width: 90%;
     max-width: 420px;
-    padding: 24px;
-    transform: scale(0.9);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    color: var(--color-text, #333);
+    padding: 28px 24px 24px 24px;
+    text-align: center;
+    transform: scale(0.92) translateY(12px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--color-text, #1e293b);
+    position: relative;
+    overflow: hidden;
 }
 
-[data-editor-theme="dark"] .custom-modal {
-    background-color: #212529;
-    color: #f8f9fa;
+[data-editor-theme="dark"] .custom-modal,
+[data-theme="dark"] .custom-modal {
+    background: #1e2430;
+    color: #f8fafc;
+    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .custom-modal-overlay.show .custom-modal {
-    transform: scale(1);
+    transform: scale(1) translateY(0);
+}
+
+.custom-modal-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    transition: transform 0.3s ease;
+}
+
+.custom-modal-badge.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+.custom-modal-badge.warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.custom-modal-badge.info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
 }
 
 .custom-modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    margin-top: 0;
+    font-size: 1.22rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: inherit;
+    letter-spacing: -0.01em;
 }
 
 .custom-modal-message {
-    font-size: 0.95rem;
-    color: var(--color-muted-text, #6c757d);
-    margin-bottom: 24px;
-    line-height: 1.5;
+    font-size: 0.92rem;
+    color: var(--color-muted-text, #64748b);
+    margin: 0 0 24px 0;
+    line-height: 1.55;
+}
+
+[data-editor-theme="dark"] .custom-modal-message,
+[data-theme="dark"] .custom-modal-message {
+    color: #94a3b8;
 }
 
 .custom-modal-input {
     width: 100%;
-    padding: 10px;
+    padding: 10px 14px;
     border: 1px solid var(--color-border, #ddd);
-    border-radius: 6px;
+    border-radius: 8px;
     margin-bottom: 20px;
     font-family: inherit;
     font-size: 0.95rem;
     background: var(--bg-color, #fff);
     color: var(--color-text, #333);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.custom-modal-input:focus {
+    border-color: var(--primary-accent, #0d6efd);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
 }
 
 .custom-modal-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 12px;
+}
+
+.custom-modal-actions .btn {
+    flex: 1;
+    padding: 0.65rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-modal-actions .btn-secondary {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.custom-modal-actions .btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+[data-editor-theme="dark"] .custom-modal-actions .btn-secondary,
+[data-theme="dark"] .custom-modal-actions .btn-secondary {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+[data-editor-theme="dark"] .custom-modal-actions .btn-secondary:hover,
+[data-theme="dark"] .custom-modal-actions .btn-secondary:hover {
+    background: #3a475c;
+    color: #ffffff;
 }
 
 /* --- Mascota About Bubble (Modern UX/UI) --- */

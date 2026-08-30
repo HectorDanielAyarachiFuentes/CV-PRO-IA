@@ -61,21 +61,62 @@
     };
 
     // --- MODALS ---
-    const showModal = (title, message, type = 'alert', onConfirm = null) => {
+    const showModal = (title, message, type = 'alert', onConfirm = null, options = {}) => {
         let overlay = document.createElement('div');
         overlay.className = 'custom-modal-overlay';
         
+        const isDanger = type === 'danger' || type === 'destructive';
+        const isConfirm = type === 'confirm' || isDanger;
+        const confirmText = options.confirmText || (isDanger ? 'Reiniciar' : 'Aceptar');
+        const cancelText = options.cancelText || 'Cancelar';
+
+        let badgeIcon = '';
+        if (isDanger) {
+            badgeIcon = `
+                <div class="custom-modal-badge danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"/>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                    </svg>
+                </div>
+            `;
+        } else if (type === 'prompt' || type === 'info') {
+            badgeIcon = `
+                <div class="custom-modal-badge info">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                </div>
+            `;
+        } else if (type === 'confirm') {
+            badgeIcon = `
+                <div class="custom-modal-badge warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+            `;
+        }
+
         let inputHtml = type === 'prompt' ? `<input type="text" id="custom-modal-input-field" class="custom-modal-input" value="${message.defaultValue || ''}">` : '';
         let msgHtml = type === 'prompt' ? `<p class="custom-modal-message">${message.text}</p>` : `<p class="custom-modal-message">${message}</p>`;
 
         overlay.innerHTML = `
             <div class="custom-modal">
+                ${badgeIcon}
                 <h3 class="custom-modal-title">${title}</h3>
                 ${msgHtml}
                 ${inputHtml}
                 <div class="custom-modal-actions">
-                    ${type !== 'alert' ? '<button class="btn btn-secondary" id="custom-modal-cancel">Cancelar</button>' : ''}
-                    <button class="btn btn-primary" id="custom-modal-confirm">Aceptar</button>
+                    ${(isConfirm || type === 'prompt') ? `<button class="btn btn-secondary" id="custom-modal-cancel">${cancelText}</button>` : ''}
+                    <button class="btn ${isDanger ? 'btn-destructive' : 'btn-primary'}" id="custom-modal-confirm">${confirmText}</button>
                 </div>
             </div>
         `;
@@ -86,11 +127,40 @@
         const close = () => {
             overlay.classList.remove('show');
             setTimeout(() => { if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+            document.removeEventListener('keydown', handleKey);
         };
+
+        const handleKey = (e) => {
+            if (e.key === 'Escape') {
+                close();
+                if (onConfirm && type !== 'prompt') onConfirm(false);
+            } else if (e.key === 'Enter' && type !== 'prompt') {
+                close();
+                if (onConfirm) onConfirm(true);
+            }
+        };
+        document.addEventListener('keydown', handleKey);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                close();
+                if (onConfirm && type !== 'prompt') onConfirm(false);
+            }
+        });
 
         const confirmBtn = overlay.querySelector('#custom-modal-confirm');
         const cancelBtn = overlay.querySelector('#custom-modal-cancel');
         const inputField = overlay.querySelector('#custom-modal-input-field');
+
+        if (inputField) {
+            setTimeout(() => inputField.focus(), 100);
+            inputField.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    close();
+                    if (onConfirm) onConfirm(inputField.value);
+                }
+            });
+        }
 
         confirmBtn.addEventListener('click', () => {
             close();
