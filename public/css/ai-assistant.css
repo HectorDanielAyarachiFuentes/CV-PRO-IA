@@ -74,20 +74,36 @@
 
 .ai-chat-header-actions {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 6px;
 }
 
 .ai-chat-header-btn {
     background: none;
     border: none;
-    color: white;
-    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 6px;
 }
 
 .ai-chat-header-btn:hover {
-    opacity: 0.8;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
+}
+
+.ai-btn-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    display: inline-block;
+    vertical-align: middle;
 }
 
 /* Expanded state for the chat window */
