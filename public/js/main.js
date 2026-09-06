@@ -792,6 +792,7 @@ ${cvHtml}
         document.querySelectorAll('.editor-nav .nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+                item.blur();
                 setActiveSection(item.getAttribute('href').substring(1));
             });
         });
