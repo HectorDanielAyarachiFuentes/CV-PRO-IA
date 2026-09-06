@@ -409,14 +409,31 @@ ${cvHtml}
         if (!section) return;
 
         const inputHandlers = {
-            personal: () => { cvData.personalInfo[target.name] = target.value; },
+            personal: () => {
+                cvData.personalInfo[target.name] = target.value;
+                if ((target.name === 'firstName' || target.name === 'lastName') && cvData.avatar?.type === 'initials') {
+                    if (!cvData.avatar.isCustom) {
+                        const newInitials = CvApp.templateHelpers ? CvApp.templateHelpers.getInitials(cvData.personalInfo) : '';
+                        if (newInitials) {
+                            cvData.avatar.value = newInitials;
+                            const initialsInput = document.getElementById('initials-input');
+                            if (initialsInput) initialsInput.value = newInitials;
+                            const panelInitials = document.getElementById('avatar-panel-initials');
+                            if (panelInitials) panelInitials.value = newInitials;
+                        }
+                    }
+                }
+            },
             experience: () => handleDynamicListInput(target, 'experience'),
             education: () => handleDynamicListInput(target, 'education'),
             impacts: () => handleDynamicListInput(target, 'impacts'),
             portfolio: () => handleDynamicListInput(target, 'portfolio'),
             avatar: () => {
                 const handler = {
-                    'initials-input': () => cvData.avatar = { type: 'initials', value: target.value.toUpperCase() },
+                    'initials-input': () => {
+                        const val = target.value.toUpperCase();
+                        cvData.avatar = { type: 'initials', value: val, isCustom: val.length > 0 };
+                    },
                     'image-url-input': () => cvData.avatar = { type: 'url', value: target.value },
                     'svg-code-input': () => cvData.avatar = { type: 'svg', value: target.value },
                     'quote-input': () => cvData.avatar = { type: 'quote', value: target.value },

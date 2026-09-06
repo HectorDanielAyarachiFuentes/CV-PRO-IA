@@ -20,6 +20,10 @@ app.use(express.static(path.join(__dirname, '../public')));
 function cleanCvForPrompt(cv) {
     if (!cv || typeof cv !== 'object') return null;
     return {
+        avatar: cv.avatar ? {
+            type: cv.avatar.type || 'initials',
+            value: cv.avatar.type === 'initials' ? (cv.avatar.value || '') : (cv.avatar.type === 'photo' ? '[foto]' : (cv.avatar.value || ''))
+        } : { type: 'initials', value: '' },
         personal: cv.personalInfo ? {
             firstName: cv.personalInfo.firstName || '',
             lastName: cv.personalInfo.lastName || '',
@@ -130,6 +134,7 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
 {
   "isJson": true,
   "data": {
+    "avatar": { "type": "initials", "value": "INICIALES_EN_MAYUSCULAS" },
     "personal": { "firstName": "", "lastName": "", "title": "", "email": "", "phone": "", "address": "", "summary": "" },
     "experience": [ { "id": "exp-1", "position": "", "company": "", "startDate": "", "endDate": "", "description": "" } ],
     "education": [ { "id": "edu-1", "degree": "", "institution": "", "startDate": "", "endDate": "", "description": "" } ],
@@ -140,6 +145,8 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
     "design": { "themeColor": "", "textColorDark": "", "textColorMuted": "", "sectionTitleColor": "" }
   }
 }
+IMPORTANTE SOBRE INICIALES / AVATAR:
+- Si el avatar es de tipo "initials" o si estás cambiando o generando el nombre de la persona (firstName / lastName), debes actualizar SIEMPRE "avatar": { "type": "initials", "value": "..." } con las iniciales en mayúsculas del nuevo nombre (por ejemplo: Homer Simpson -> "HS", Homero Simpson -> "HS", Bruce Wayne -> "BW"). ¡Nunca dejes las iniciales anteriores si cambias el nombre!
 Asegúrate de conservar en el JSON final cualquier dato que ya existiera en el 'ESTADO ACTUAL DEL CV' si el usuario no pidió borrarlo. Sin embargo, si estás extrayendo datos de un documento nuevo proporcionado por el usuario, DEBES enviar arreglos vacíos [] para impacts, portfolio, footer y cualquier otra lista si la información no está presente en el documento, para que se borren los datos de ejemplo.
 Si aún estás recolectando información y no es momento de actualizar el documento, responde de manera normal y conversacional en texto plano.${cvActualContexto}`;
 

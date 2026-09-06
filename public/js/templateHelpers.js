@@ -4,9 +4,30 @@
     window.CvApp = window.CvApp || {};
 
     const templateHelpers = {
-        // --- Funciones básicas ---
-        getFullName: (p) => `${p.firstName || ''} ${p.lastName || ''}`.trim(),
-        getInitials: (p) => `${p.firstName ? p.firstName[0] : ''}${p.lastName ? p.lastName[0] : ''}`,
+        getFullName: (p) => `${p?.firstName || ''} ${p?.lastName || ''}`.trim(),
+        getInitials: (p) => {
+            if (!p) return '';
+            const fn = (p.firstName || '').trim();
+            const ln = (p.lastName || '').trim();
+            if (fn && ln) {
+                return `${fn[0] || ''}${ln[0] || ''}`.toUpperCase();
+            }
+            if (fn) {
+                const parts = fn.split(/\s+/).filter(Boolean);
+                if (parts.length > 1) {
+                    return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+                }
+                return fn.substring(0, Math.min(2, fn.length)).toUpperCase();
+            }
+            if (ln) {
+                const parts = ln.split(/\s+/).filter(Boolean);
+                if (parts.length > 1) {
+                    return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+                }
+                return ln.substring(0, Math.min(2, ln.length)).toUpperCase();
+            }
+            return '';
+        },
         formatDate: (dateStr) => {
             if (!dateStr) return '';
             const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];

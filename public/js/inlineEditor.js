@@ -232,7 +232,10 @@
                 svg: () => document.getElementById('avatar-panel-svg')?.value || '',
             };
 
-            cvData.avatar = { type, value: (valueMap[type] || (() => ''))() };
+            const chosenValue = (valueMap[type] || (() => ''))();
+            cvData.avatar = { type, value: chosenValue, isCustom: type === 'initials' && !!chosenValue };
+            const initialsInput = document.getElementById('initials-input');
+            if (initialsInput && type === 'initials') initialsInput.value = chosenValue;
             CvApp.updateAndRender();
             hideAvatarPanel();
             setTimeout(markAvatarClickable, 100);

@@ -145,8 +145,11 @@ ${edu.description ? escapeTypst(edu.description).replace(/\n/g, ' \\ ') : ''}
     const templatesMap = customTemplates || typstTemplates;
     let templateRaw = templatesMap[layoutKey] || templatesMap['classic'] || '';
 
-    const fullName = `${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`.trim();
-    const initials = (cvData.personalInfo?.firstName?.[0] || '') + (cvData.personalInfo?.lastName?.[0] || '');
+    const initials = (cvData.avatar?.type === 'initials' && cvData.avatar?.value)
+      ? cvData.avatar.value
+      : ((window.CvApp && window.CvApp.templateHelpers)
+          ? window.CvApp.templateHelpers.getInitials(cvData.personalInfo)
+          : ((cvData.personalInfo?.firstName?.[0] || '') + (cvData.personalInfo?.lastName?.[0] || '')));
 
     const sectionsTypst = buildTypstSections(cvData);
     const skillsListTypst = buildTypstSkillsList(cvData.skills);

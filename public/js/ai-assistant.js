@@ -132,6 +132,37 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newCvData.design.sectionTitleColor !== undefined) currentData.sectionTitleColor = newCvData.design.sectionTitleColor;
         }
 
+        // Manejo y actualización de avatar e iniciales
+        if (newCvData.avatar) {
+            currentData.avatar = {
+                type: newCvData.avatar.type || currentData.avatar?.type || 'initials',
+                value: newCvData.avatar.value !== undefined ? newCvData.avatar.value : (currentData.avatar?.value || ''),
+                isCustom: !!newCvData.avatar.value
+            };
+        }
+
+        // Si el avatar es de tipo iniciales o si cambió el nombre personal, sincronizar las iniciales
+        if (currentData.avatar && currentData.avatar.type === 'initials') {
+            if (newCvData.avatar && newCvData.avatar.value) {
+                currentData.avatar.value = String(newCvData.avatar.value).toUpperCase();
+            } else if (newCvData.personal && (newCvData.personal.firstName || newCvData.personal.lastName)) {
+                const helperInitials = (window.CvApp && window.CvApp.templateHelpers && typeof window.CvApp.templateHelpers.getInitials === 'function')
+                    ? window.CvApp.templateHelpers.getInitials(currentData.personalInfo)
+                    : `${(currentData.personalInfo.firstName || '')[0] || ''}${(currentData.personalInfo.lastName || '')[0] || ''}`.toUpperCase();
+                if (helperInitials) {
+                    currentData.avatar.value = helperInitials;
+                }
+            }
+        }
+
+        // Sincronizar inputs de iniciales en el DOM si están presentes
+        if (currentData.avatar?.type === 'initials') {
+            const initialsInput = document.getElementById('initials-input');
+            if (initialsInput) initialsInput.value = currentData.avatar.value || '';
+            const panelInitials = document.getElementById('avatar-panel-initials');
+            if (panelInitials) panelInitials.value = currentData.avatar.value || '';
+        }
+
         window.CvApp.state.cvData = currentData;
 
         if (typeof window.CvApp.updateAndRender === 'function') {
