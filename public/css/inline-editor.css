@@ -250,12 +250,21 @@
 }
 
 .avatar-panel-icon-grid::-webkit-scrollbar {
-    width: 4px;
+    width: 5px;
+}
+
+.avatar-panel-icon-grid::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .avatar-panel-icon-grid::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 9999px;
+    transition: background 0.2s ease;
+}
+
+.avatar-panel-icon-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45);
 }
 
 .avatar-panel-icon-option {

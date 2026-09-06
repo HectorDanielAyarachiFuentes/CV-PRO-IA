@@ -1,4 +1,4 @@
-﻿/* --- Tema Oscuro para el Editor --- */
+/* --- Tema Oscuro para el Editor --- */
 [data-editor-theme="dark"] .editor-panel {
     background-color: #212529;
     color: #f8f9fa;
@@ -167,9 +167,26 @@
     transform: rotate(0deg);
 }
 
-/* SoluciÃ³n: Invierte el color del SVG de la luna en modo oscuro para que sea visible */
+/* Solución: Invierte el color del SVG de la luna en modo oscuro para que sea visible */
 [data-editor-theme="dark"] .theme-icon-moon {
     filter: invert(1);
+}
+
+/* --- Scrollbar Pro en Modo Oscuro --- */
+[data-editor-theme="dark"] {
+    color-scheme: dark;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(255, 255, 255, 0.22);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.42);
+    --scrollbar-thumb-active: rgba(255, 255, 255, 0.65);
+}
+
+[data-editor-theme="dark"] .preview-panel {
+    /* El panel de vista previa mantiene fondo claro para contraste del documento */
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
+    --scrollbar-thumb-active: rgba(0, 0, 0, 0.55);
 }
 
 
