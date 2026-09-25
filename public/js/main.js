@@ -50,7 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
             cvPreviewWrapper.innerHTML = `<div style="padding:2rem; text-align:center; color:red;">Error: La plantilla seleccionada no se pudo cargar.</div>`;
             return;
         }
-        cvPreviewWrapper.innerHTML = templateFn(cvData, CvApp.templateHelpers);
+        try {
+            cvPreviewWrapper.innerHTML = templateFn(cvData, CvApp.templateHelpers);
+        } catch (err) {
+            console.error(`Error al renderizar plantilla "${layout}":`, err);
+            cvPreviewWrapper.innerHTML = `<div style="padding:2rem; text-align:center; color:#dc3545;"><h3>Error al generar vista previa</h3><p>Los datos ingresados no pudieron procesarse con la plantilla "${layout}".</p></div>`;
+            return;
+        }
 
         // Inyectar secciones personalizadas en el área principal del template renderizado
         if (cvData.customSections && cvData.customSections.length > 0) {
@@ -98,16 +104,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         const layoutName = layoutCard.dataset.layout;
                         const templateFn = state.templates[layoutName];
                         if (templateFn) {
-                            container.innerHTML = templateFn(state.cvData, CvApp.templateHelpers);
-                            const child = container.firstElementChild;
-                            if (child) {
-                                const containerWidth = container.clientWidth || 120;
-                                const scale = containerWidth / 794;
-                                child.style.width = '794px';
-                                child.style.height = '1123px';
-                                child.style.transform = `scale(${scale})`;
-                                child.style.transformOrigin = 'top left';
-                                child.style.pointerEvents = 'none';
+                            try {
+                                container.innerHTML = templateFn(state.cvData, CvApp.templateHelpers);
+                                const child = container.firstElementChild;
+                                if (child) {
+                                    const containerWidth = container.clientWidth || 120;
+                                    const scale = containerWidth / 794;
+                                    child.style.width = '794px';
+                                    child.style.height = '1123px';
+                                    child.style.transform = `scale(${scale})`;
+                                    child.style.transformOrigin = 'top left';
+                                    child.style.pointerEvents = 'none';
+                                }
+                            } catch (err) {
+                                console.warn(`Error al renderizar mini-previsualización de "${layoutName}":`, err);
                             }
                         }
                     }

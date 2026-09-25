@@ -29,7 +29,8 @@
     position: absolute;
     bottom: 80px;
     right: 0;
-    width: 350px;
+    width: 360px;
+    max-width: calc(100vw - 30px);
     height: 500px;
     background: var(--bg-color, #ffffff);
     border: 1px solid var(--color-border, #e5e7eb);
@@ -200,10 +201,10 @@
 }
 
 .ai-chat-input-area {
-    padding: 15px;
+    padding: 10px 12px;
     border-top: 1px solid var(--color-border, #e5e7eb);
     display: flex;
-    gap: 10px;
+    gap: 6px;
     align-items: center;
     background: var(--bg-color, #ffffff);
 }
@@ -213,15 +214,18 @@
     border: none;
     cursor: pointer;
     color: var(--color-muted-text, #6c757d);
-    padding: 5px;
+    padding: 6px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
+    flex-shrink: 0;
+    transition: color 0.2s, background-color 0.2s;
 }
 
 .ai-attach-btn:hover {
     color: var(--primary-accent, #2563eb);
+    background-color: var(--color-light-bg, rgba(0, 0, 0, 0.04));
 }
 
 .ai-attach-btn.recording {
@@ -231,22 +235,54 @@
 
 @keyframes mic-pulse {
     from { transform: scale(1); filter: drop-shadow(0 0 2px rgba(220, 53, 69, 0.4)); }
-    to { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(220, 53, 69, 0.8)); }
+    to { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(220, 53, 69, 0.8)); }
 }
 
 #ai-chat-input {
     flex: 1;
-    padding: 10px;
+    min-width: 0;
+    padding: 8px 12px;
     border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 6px;
+    border-radius: 8px;
     outline: none;
     background: var(--bg-color-alt, #f9fafb);
     color: var(--color-text, #333);
+    font-size: 0.88rem;
+    transition: border-color 0.2s;
 }
 
+#ai-chat-input:focus {
+    border-color: var(--primary-accent, #0d6efd);
+}
+
+.ai-chat-send-btn,
 #ai-chat-send {
-    padding: 10px 15px;
-    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--primary-accent, #0d6efd);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.ai-chat-send-btn:hover,
+#ai-chat-send:hover {
+    filter: brightness(1.12);
+    transform: scale(1.05);
+}
+
+.ai-chat-send-btn:active,
+#ai-chat-send:active {
+    transform: scale(0.95);
 }
 
 /* Ocultar el widget de chat al imprimir/descargar PDF */
