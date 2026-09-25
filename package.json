@@ -4,7 +4,9 @@
   "description": "Un asistente de IA para crear y mejorar tu currículum profesional.",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "gitnexus": "gitnexus serve",
+    "gitnexus:analyze": "gitnexus analyze"
   },
   "repository": {
     "type": "git",
