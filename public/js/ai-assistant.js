@@ -8,7 +8,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('ai-chat-input');
     const sendBtn = document.getElementById('ai-chat-send');
     const attachBtn = document.getElementById('ai-chat-attach-btn');
+    const micBtn = document.getElementById('ai-chat-mic-btn');
     const fileInput = document.getElementById('ai-chat-file');
+
+    // Integración de voz mediante VoiceManager
+    let voiceManager = null;
+    if (typeof VoiceManager !== 'undefined') {
+        try {
+            voiceManager = new VoiceManager();
+            voiceManager.onMicResult = (finalTranscript, interimTranscript) => {
+                const text = finalTranscript || interimTranscript;
+                if (text) chatInput.value = text;
+            };
+            voiceManager.onMicEnd = () => {
+                if (micBtn) micBtn.classList.remove('recording');
+                chatInput.placeholder = 'Escribe tu respuesta aquí...';
+            };
+            voiceManager.onMicError = () => {
+                if (micBtn) micBtn.classList.remove('recording');
+                chatInput.placeholder = 'Escribe tu respuesta aquí...';
+            };
+        } catch (err) {
+            console.warn("No se pudo inicializar VoiceManager en el asistente:", err);
+        }
+    }
+
+    if (micBtn && voiceManager) {
+        micBtn.addEventListener('click', () => {
+            const isActive = voiceManager.toggleMic();
+            if (isActive) {
+                micBtn.classList.add('recording');
+                chatInput.placeholder = '🎙️ Escuchando tu voz...';
+            } else {
+                micBtn.classList.remove('recording');
+                chatInput.placeholder = 'Escribe tu respuesta aquí...';
+            }
+        });
+    }
 
     const INITIAL_GREETING = '¡Hola! Soy tu asistente de IA. ¿Quieres que te ayude a rellenar tu currículum haciéndote algunas preguntas o subiendo un archivo?';
 

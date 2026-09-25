@@ -139,7 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DRAG & DROP LOGIC ---
     const setupDragAndDrop = () => {
         const list = document.getElementById('section-order-list');
-        if (!list) return;
+        if (!list || list._hasDragDropListeners) return;
+        list._hasDragDropListeners = true;
 
         let draggedItem = null;
 
@@ -149,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         list.addEventListener('dragend', e => {
+            if (!draggedItem) return;
             draggedItem.classList.remove('dragging');
             draggedItem = null;
             const newOrder = [...list.querySelectorAll('.draggable-item')].map(item => item.dataset.sectionKey);
@@ -158,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         list.addEventListener('dragover', e => {
             e.preventDefault();
+            if (!draggedItem) return;
             const afterElement = [...list.querySelectorAll('.draggable-item:not(.dragging)')].reduce((closest, child) => {
                 const box = child.getBoundingClientRect();
                 const offset = e.clientY - box.top - box.height / 2;
@@ -174,6 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const highlightableElements = formWrapper.querySelectorAll('[data-highlight-selector]');
 
         highlightableElements.forEach(element => {
+            if (element._hasHighlightListeners) return;
+            element._hasHighlightListeners = true;
             const selector = element.dataset.highlightSelector;
             if (!selector) return;
 

@@ -7,8 +7,10 @@ const TypstCompiler = (() => {
   let typstTemplates = {};
 
   // Función para escapar caracteres especiales de sintaxis Typst en los datos del usuario
-  const escapeTypst = (str) => {
-    if (!str || typeof str !== 'string') return '';
+  const escapeTypst = (input) => {
+    if (input === null || input === undefined) return '';
+    const str = typeof input === 'string' ? input : String(input);
+    if (!str) return '';
     return str
       .replace(/\\/g, '\\\\')
       .replace(/#/g, '\\#')
@@ -17,7 +19,10 @@ const TypstCompiler = (() => {
       .replace(/\[/g, '\\[')
       .replace(/\]/g, '\\]')
       .replace(/\*/g, '\\*')
-      .replace(/_/g, '\\_');
+      .replace(/_/g, '\\_')
+      .replace(/</g, '\\<')
+      .replace(/>/g, '\\>')
+      .replace(/`/g, '\\`');
   };
 
   // Cargar las plantillas desde json-typst/typst.json

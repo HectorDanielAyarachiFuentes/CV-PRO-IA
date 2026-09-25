@@ -224,6 +224,16 @@
     color: var(--primary-accent, #2563eb);
 }
 
+.ai-attach-btn.recording {
+    color: #dc3545 !important;
+    animation: mic-pulse 1s infinite alternate;
+}
+
+@keyframes mic-pulse {
+    from { transform: scale(1); filter: drop-shadow(0 0 2px rgba(220, 53, 69, 0.4)); }
+    to { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(220, 53, 69, 0.8)); }
+}
+
 #ai-chat-input {
     flex: 1;
     padding: 10px;

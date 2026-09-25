@@ -40,6 +40,7 @@ function cleanCvForPrompt(cv) {
             company: e.company || '',
             startDate: e.startDate || '',
             endDate: e.endDate || '',
+            current: Boolean(e.current),
             description: e.description || ''
         })) : [],
         education: Array.isArray(cv.education) ? cv.education.map(e => ({
@@ -48,6 +49,7 @@ function cleanCvForPrompt(cv) {
             institution: e.institution || '',
             startDate: e.startDate || '',
             endDate: e.endDate || '',
+            current: Boolean(e.current),
             description: e.description || ''
         })) : [],
         skills: Array.isArray(cv.skills) ? cv.skills.map(s => ({
