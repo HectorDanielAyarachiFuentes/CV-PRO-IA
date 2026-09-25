@@ -50,6 +50,8 @@ Está construido con **HTML5 semántico**, **CSS nativo modular**, **JavaScript 
 - `validators.js`: Validaciones de formularios, correos y campos requeridos.
 - `ai-assistant.js`: Comunicación con el endpoint de IA del backend para optimización y chat.
 - `modules/voice.js`: Módulo de reconocimiento y síntesis de voz para interacción por voz.
+- `modules/exporter.js`: Módulo desacoplado de exportación (impresión PDF nativa, descarga HTML autónoma, código Typst y enlaces compartidos con compresión LZString).
+- `state.js`: Persistencia reactiva con auto-guardado debounced (600ms) a `localStorage` y salvaguarda inmediata en evento `beforeunload`.
 
 #### 🗂️ `public/data/` (Recursos y Plantillas)
 - `html/` & `typst/`: Plantillas oficiales de CV (ej. Harvard, Modern, Minimalist, etc.).

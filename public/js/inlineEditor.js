@@ -262,7 +262,7 @@
         cvPreviewWrapper.addEventListener('mouseup', handleSelectionChange);
         cvPreviewWrapper.addEventListener('keyup', handleSelectionChange);
 
-        // Capturar historial de edición directa en fullscreen
+        // Capturar historial de edición directa en fullscreen y sincronizar con estado/localStorage
         let _fsInputDebounce = null;
         cvPreviewWrapper.addEventListener('input', () => {
             if (!document.body.classList.contains('fullscreen-preview')) return;
@@ -274,7 +274,21 @@
             _fsInputDebounce = setTimeout(() => {
                 CvApp.history.fsPrevHtml = cvPreviewWrapper.innerHTML;
                 CvApp.updateHistoryBtns();
-            }, 150);
+                syncFromInlinePreview();
+                if (typeof CvApp.saveState === 'function') {
+                    CvApp.saveState(); // Auto-guardado con debounce en localStorage
+                }
+            }, 250);
+        });
+
+        // Asegurar que si el usuario refresca o cierra la pestaña mientras edita en pantalla completa, se persistan los cambios
+        window.addEventListener('beforeunload', () => {
+            if (document.body.classList.contains('fullscreen-preview')) {
+                syncFromInlinePreview();
+                if (typeof CvApp.saveStateImmediate === 'function') {
+                    CvApp.saveStateImmediate();
+                }
+            }
         });
 
         document.addEventListener('mousedown', (e) => {
@@ -429,6 +443,108 @@
         inlineEditorAddSubsectionBtn.addEventListener('mousedown', (e) => e.preventDefault());
     };
 
+    /**
+     * Sincroniza las ediciones realizadas directamente en el DOM del preview (modo pantalla completa)
+     * hacia el estado global (CvApp.state.cvData) y actualiza los campos del formulario.
+     */
+    const syncFromInlinePreview = () => {
+        const cvPreviewWrapper = document.getElementById('cv-preview-wrapper');
+        if (!cvPreviewWrapper) return;
+        const cvData = CvApp.state?.cvData;
+        if (!cvData) return;
+
+        // 1. Extraer Nombre y Apellido (h1)
+        const h1 = cvPreviewWrapper.querySelector('h1');
+        if (h1 && cvData.personalInfo) {
+            const rawName = h1.innerText.replace(/[\r\n]+/g, ' ').trim();
+            if (rawName) {
+                // Eliminar posibles sufijos de plantillas como "Nombre > Professional"
+                const cleanedName = rawName.split('>')[0].trim();
+                const parts = cleanedName.split(/\s+/).filter(Boolean);
+                if (parts.length === 1) {
+                    cvData.personalInfo.firstName = parts[0];
+                    cvData.personalInfo.lastName = '';
+                } else if (parts.length > 1) {
+                    cvData.personalInfo.firstName = parts[0];
+                    cvData.personalInfo.lastName = parts.slice(1).join(' ');
+                }
+            }
+        }
+
+        // 2. Extraer Título Profesional (h2)
+        const h2 = cvPreviewWrapper.querySelector('h2');
+        if (h2 && cvData.personalInfo) {
+            cvData.personalInfo.title = h2.innerText.replace(/[\r\n]+/g, ' ').trim();
+        }
+
+        // 3. Extraer elementos estructurados con [data-section-key] y [data-id]
+        cvPreviewWrapper.querySelectorAll('[data-section-key][data-id]').forEach(el => {
+            const sectionKey = el.dataset.sectionKey;
+            const itemId = el.dataset.id;
+            if (!sectionKey || !itemId || !Array.isArray(cvData[sectionKey])) return;
+
+            const item = cvData[sectionKey].find(i => String(i.id) === String(itemId));
+            if (!item) return;
+
+            el.querySelectorAll('[data-field]').forEach(fieldEl => {
+                const field = fieldEl.dataset.field;
+                if (field && field in item) {
+                    // Evitar sobreescribir fechas si tienen formato visual (ej. Ene 2020 - Actual)
+                    if (field === 'startDate' || field === 'endDate') return;
+                    item[field] = fieldEl.innerText.trim();
+                }
+            });
+        });
+
+        // 4. Extraer Resumen si está en contenedor identificable
+        const summaryEl = cvPreviewWrapper.querySelector('[data-section-key="summary"] p, [data-field="summary"]');
+        if (summaryEl && cvData.personalInfo) {
+            cvData.personalInfo.summary = summaryEl.innerText.trim();
+        }
+
+        // 5. Guardar el HTML completo personalizado en el estado
+        cvData.customHtml = cvPreviewWrapper.innerHTML;
+
+        // 6. Reflejar cambios en los inputs del formulario en el panel izquierdo
+        updateFormInputsFromState();
+    };
+
+    /**
+     * Actualiza los inputs del formulario activo en el panel lateral
+     * para mantener sincronía bidireccional inmediata.
+     */
+    const updateFormInputsFromState = () => {
+        const cvData = CvApp.state?.cvData;
+        if (!cvData) return;
+        const formWrapper = document.getElementById('form-section-wrapper');
+        if (!formWrapper) return;
+
+        const activeSection = formWrapper.querySelector('.form-section.active')?.dataset.section;
+        if (activeSection === 'personal' && cvData.personalInfo) {
+            const fnInput = formWrapper.querySelector('input[name="firstName"]');
+            const lnInput = formWrapper.querySelector('input[name="lastName"]');
+            const titleInput = formWrapper.querySelector('input[name="title"]');
+            const summaryInput = formWrapper.querySelector('textarea[name="summary"]');
+
+            if (fnInput && fnInput.value !== cvData.personalInfo.firstName) fnInput.value = cvData.personalInfo.firstName || '';
+            if (lnInput && lnInput.value !== cvData.personalInfo.lastName) lnInput.value = cvData.personalInfo.lastName || '';
+            if (titleInput && titleInput.value !== cvData.personalInfo.title) titleInput.value = cvData.personalInfo.title || '';
+            if (summaryInput && summaryInput.value !== cvData.personalInfo.summary) summaryInput.value = cvData.personalInfo.summary || '';
+        } else if (activeSection && Array.isArray(cvData[activeSection])) {
+            cvData[activeSection].forEach(item => {
+                const itemEl = formWrapper.querySelector(`.item[data-id="${item.id}"]`);
+                if (itemEl) {
+                    for (const key in item) {
+                        const input = itemEl.querySelector(`[name="${key}"]`);
+                        if (input && input.value !== item[key] && input.type !== 'file' && input.type !== 'checkbox') {
+                            input.value = item[key] || '';
+                        }
+                    }
+                }
+            });
+        }
+    };
+
     // --- Exponer API pública ---
     CvApp.showInlineToolbar = showInlineToolbar;
     CvApp.hideInlineToolbar = hideInlineToolbar;
@@ -436,4 +552,6 @@
     CvApp.markAvatarClickable = markAvatarClickable;
     CvApp.setupInlineEditorListeners = setupInlineEditorListeners;
     CvApp.setupAvatarEditorPanel = setupAvatarEditorPanel;
+    CvApp.syncFromInlinePreview = syncFromInlinePreview;
+    CvApp.updateFormInputsFromState = updateFormInputsFromState;
 })();

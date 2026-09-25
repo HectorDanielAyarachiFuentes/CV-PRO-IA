@@ -57,6 +57,7 @@ Este proyecto es un generador/editor de currículums profesionales (CV) asistido
    - `public/js/inlineEditor.js`: Edición interactiva directa sobre la vista previa.
    - `public/js/typst-compiler.js`: Compilación y renderizado Typst.
    - `public/js/modules/voice.js`: Integración de comandos y dictado por voz.
+   - `public/js/modules/exporter.js`: Exportación desacoplada (PDF nativo, HTML autónomo, Typst, Enlace compartido).
    - `public/js/ai-assistant.js`: Asistente conversacional para pulir redacción de CV y sugerencias.
    - `public/css/`: Sistema CSS Vainilla modular (`base.css`, `layout.css`, `preview.css`, etc.) sin dependencias pesadas.
 

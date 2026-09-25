@@ -144,7 +144,7 @@
             }
         }
         CvApp.renderCVPreview();
-        CvApp.saveState();
+        CvApp.saveState(immediate);
         _prevSnapshot = JSON.stringify(cvData);
     };
 

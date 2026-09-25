@@ -83,20 +83,54 @@
     let svgCache = {};
     let templates = {};
 
-    // --- Funciones de persistencia ---
-    const saveState = () => {
+    // --- Funciones de persistencia con Auto-guardado (Debounce) ---
+    let _saveDebounceTimer = null;
+    const SAVE_DEBOUNCE_MS = 600;
+
+    const saveStateImmediate = () => {
+        if (_saveDebounceTimer) {
+            clearTimeout(_saveDebounceTimer);
+            _saveDebounceTimer = null;
+        }
         try {
             localStorage.setItem('cvProData', JSON.stringify(cvData));
-            CvApp.showSaveNotification();
+            if (typeof CvApp.showSaveNotification === 'function') {
+                CvApp.showSaveNotification();
+            }
         } catch (error) {
             console.error("Error al guardar el estado en localStorage:", error);
         }
     };
 
+    const saveState = (immediate = false) => {
+        if (immediate) {
+            saveStateImmediate();
+            return;
+        }
+        if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
+        _saveDebounceTimer = setTimeout(() => {
+            saveStateImmediate();
+        }, SAVE_DEBOUNCE_MS);
+    };
+
+    // Asegurar que nunca se pierda un cambio si el usuario cierra o refresca la pestaña
+    window.addEventListener('beforeunload', () => {
+        if (_saveDebounceTimer) {
+            saveStateImmediate();
+        }
+    });
+
     const loadState = () => {
-        const savedData = localStorage.getItem('cvProData');
-        if (savedData) {
-            Object.assign(cvData, JSON.parse(savedData));
+        try {
+            const savedData = localStorage.getItem('cvProData');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && typeof parsed === 'object') {
+                    Object.assign(cvData, parsed);
+                }
+            }
+        } catch (error) {
+            console.error("Error al cargar el estado desde localStorage:", error);
         }
     };
 
@@ -184,6 +218,7 @@
     };
 
     CvApp.saveState = saveState;
+    CvApp.saveStateImmediate = saveStateImmediate;
     CvApp.loadState = loadState;
     CvApp.loadIcons = loadIcons;
     CvApp.loadGradientPresets = loadGradientPresets;
