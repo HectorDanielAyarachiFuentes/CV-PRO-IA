@@ -10,8 +10,23 @@ const {
     WidthType, 
     AlignmentType, 
     BorderStyle, 
-    ShadingType 
+    ShadingType,
+    HeightRule,
+    TabStopType
 } = docx;
+
+// Constantes métricas para asegurar que las barras laterales y fondos llenen la página al 100%
+const PAGE_SIZE_A4 = { width: 11906, height: 16838 };
+const ZERO_MARGINS = { top: 0, bottom: 0, left: 0, right: 0 };
+const FULL_PAGE_MIN_HEIGHT = 15500; // dxa para que el fondo o sidebar llegue al borde inferior sin desbordar
+const SPLIT_BODY_MIN_HEIGHT = 13500; // dxa para cuerpos bajo banners superiores
+
+function createTinyTrailingParagraph() {
+    return new Paragraph({
+        spacing: { before: 0, after: 0, line: 20 },
+        children: [new TextRun({ text: '', size: 2 })]
+    });
+}
 
 // --- DICCIONARIO DE PRESETS PARA TODAS LAS 42 PLANTILLAS ---
 const TEMPLATE_PRESETS = {
@@ -168,45 +183,16 @@ function createExperienceItems(experience, themeColor, textColorDark, textColorM
     experience.forEach(e => {
         const dateStr = formatRange(e.startDate, e.endDate, e.current);
 
-        // Fila de encabezado: Cargo a la izquierda, Fecha a la derecha
-        items.push(new Table({
-            width: { size: 100, type: WidthType.PERCENTAGE },
-            borders: {
-                top: { style: BorderStyle.NONE },
-                bottom: { style: BorderStyle.NONE },
-                left: { style: BorderStyle.NONE },
-                right: { style: BorderStyle.NONE },
-                insideHorizontal: { style: BorderStyle.NONE },
-                insideVertical: { style: BorderStyle.NONE }
-            },
-            rows: [
-                new TableRow({
-                    children: [
-                        new TableCell({
-                            width: { size: 75, type: WidthType.PERCENTAGE },
-                            children: [
-                                new Paragraph({
-                                    spacing: { before: 80, after: 20 },
-                                    children: [
-                                        new TextRun({ text: e.position || '', bold: true, color: textColorDark, size: 19, font: font })
-                                    ]
-                                })
-                            ]
-                        }),
-                        new TableCell({
-                            width: { size: 25, type: WidthType.PERCENTAGE },
-                            children: [
-                                new Paragraph({
-                                    alignment: AlignmentType.RIGHT,
-                                    spacing: { before: 80, after: 20 },
-                                    children: [
-                                        new TextRun({ text: dateStr || '', color: textColorMuted, size: 15, font: font })
-                                    ]
-                                })
-                            ]
-                        })
-                    ]
-                })
+        // Párrafo con Tab Stop para alinear el Cargo a la izquierda y la Fecha a la derecha sin tablas anidadas
+        items.push(new Paragraph({
+            spacing: { before: 80, after: 20 },
+            tabStops: [{ type: TabStopType.RIGHT, position: 7000 }],
+            children: [
+                new TextRun({ text: e.position || '', bold: true, color: textColorDark, size: 19, font: font }),
+                ...(dateStr ? [
+                    new TextRun({ text: '\t' }),
+                    new TextRun({ text: dateStr, color: textColorMuted, size: 15, font: font })
+                ] : [])
             ]
         }));
 
@@ -249,44 +235,16 @@ function createEducationItems(education, themeColor, textColorDark, textColorMut
     education.forEach(e => {
         const dateStr = formatRange(e.startDate, e.endDate, e.current);
 
-        items.push(new Table({
-            width: { size: 100, type: WidthType.PERCENTAGE },
-            borders: {
-                top: { style: BorderStyle.NONE },
-                bottom: { style: BorderStyle.NONE },
-                left: { style: BorderStyle.NONE },
-                right: { style: BorderStyle.NONE },
-                insideHorizontal: { style: BorderStyle.NONE },
-                insideVertical: { style: BorderStyle.NONE }
-            },
-            rows: [
-                new TableRow({
-                    children: [
-                        new TableCell({
-                            width: { size: 75, type: WidthType.PERCENTAGE },
-                            children: [
-                                new Paragraph({
-                                    spacing: { before: 80, after: 20 },
-                                    children: [
-                                        new TextRun({ text: e.degree || '', bold: true, color: textColorDark, size: 19, font: font })
-                                    ]
-                                })
-                            ]
-                        }),
-                        new TableCell({
-                            width: { size: 25, type: WidthType.PERCENTAGE },
-                            children: [
-                                new Paragraph({
-                                    alignment: AlignmentType.RIGHT,
-                                    spacing: { before: 80, after: 20 },
-                                    children: [
-                                        new TextRun({ text: dateStr || '', color: textColorMuted, size: 15, font: font })
-                                    ]
-                                })
-                            ]
-                        })
-                    ]
-                })
+        // Párrafo con Tab Stop para alinear Título a la izquierda y Fecha a la derecha sin tablas anidadas
+        items.push(new Paragraph({
+            spacing: { before: 80, after: 20 },
+            tabStops: [{ type: TabStopType.RIGHT, position: 7000 }],
+            children: [
+                new TextRun({ text: e.degree || '', bold: true, color: textColorDark, size: 19, font: font }),
+                ...(dateStr ? [
+                    new TextRun({ text: '\t' }),
+                    new TextRun({ text: dateStr, color: textColorMuted, size: 15, font: font })
+                ] : [])
             ]
         }));
 
@@ -367,7 +325,6 @@ function createTimelineItems(itemsList, isExp, themeColor, textColorDark, textCo
             rows: [
                 new TableRow({
                     children: [
-                        // Columna del nodo con línea vertical
                         new TableCell({
                             width: { size: 6, type: WidthType.PERCENTAGE },
                             borders: {
@@ -386,7 +343,6 @@ function createTimelineItems(itemsList, isExp, themeColor, textColorDark, textCo
                                 })
                             ]
                         }),
-                        // Columna del contenido
                         new TableCell({
                             width: { size: 94, type: WidthType.PERCENTAGE },
                             margins: { left: 240, top: 0, bottom: 120, right: 100 },
@@ -462,7 +418,6 @@ function createSkillsElements(skills, style = 'bars', themeColor, textColor, inS
             }));
         });
     } else {
-        // Estilo lista con niveles en texto entre paréntesis
         skills.forEach(s => {
             elements.push(new Paragraph({
                 spacing: { before: 30, after: 30 },
@@ -476,7 +431,7 @@ function createSkillsElements(skills, style = 'bars', themeColor, textColor, inS
     return elements;
 }
 
-// Tarjetas Callout para "Impacto Clave"
+// Tarjetas Callout para "Impacto Clave" utilizando párrafos nativos con borde izquierdo y sombreado
 function createImpactsElements(impacts, themeColor, textColorDark, font = 'Segoe UI') {
     const elements = [];
     if (!Array.isArray(impacts) || impacts.length === 0) return elements;
@@ -484,37 +439,15 @@ function createImpactsElements(impacts, themeColor, textColorDark, font = 'Segoe
     impacts.forEach(imp => {
         if (!imp.description) return;
 
-        elements.push(new Table({
-            width: { size: 100, type: WidthType.PERCENTAGE },
-            borders: {
-                top: { style: BorderStyle.NONE },
-                bottom: { style: BorderStyle.NONE },
-                right: { style: BorderStyle.NONE },
-                left: { style: BorderStyle.SINGLE, size: 28, color: themeColor },
-                insideHorizontal: { style: BorderStyle.NONE },
-                insideVertical: { style: BorderStyle.NONE }
-            },
-            rows: [
-                new TableRow({
-                    children: [
-                        new TableCell({
-                            width: { size: 100, type: WidthType.PERCENTAGE },
-                            shading: { fill: 'F4F4F5', type: ShadingType.CLEAR },
-                            margins: { top: 120, bottom: 120, left: 180, right: 180 },
-                            children: [
-                                new Paragraph({
-                                    spacing: { before: 0, after: 0 },
-                                    children: [
-                                        new TextRun({ text: imp.description, color: textColorDark, size: 16, font: font })
-                                    ]
-                                })
-                            ]
-                        })
-                    ]
-                })
+        elements.push(new Paragraph({
+            spacing: { before: 60, after: 60 },
+            border: { left: { color: themeColor, size: 28, style: BorderStyle.SINGLE, space: 12 } },
+            shading: { fill: 'F4F4F5', type: ShadingType.CLEAR },
+            indent: { left: 160, right: 160 },
+            children: [
+                new TextRun({ text: imp.description, color: textColorDark, size: 16, font: font })
             ]
         }));
-        elements.push(new Paragraph({ spacing: { before: 0, after: 70 } }));
     });
     return elements;
 }
@@ -693,6 +626,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: 14500, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -707,8 +641,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 300, right: 300 } } },
-                children: [topBand, new Paragraph({ spacing: { before: 60, after: 60 } }), elevatedCardTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 0, bottom: 0, left: 300, right: 300 } } },
+                children: [topBand, new Paragraph({ spacing: { before: 60, after: 60 } }), elevatedCardTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -854,6 +788,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 68, type: WidthType.PERCENTAGE },
@@ -872,8 +807,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [bannerTable, bodySplitTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [bannerTable, bodySplitTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -953,6 +888,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -967,8 +903,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [darkWrap]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [darkWrap, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1056,7 +992,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 600, bottom: 600, left: 600, right: 600 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 600, bottom: 600, left: 600, right: 600 } } },
                 children: bodyElements
             }]
         });
@@ -1147,6 +1083,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -1161,8 +1098,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [bgTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [bgTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1238,6 +1175,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 35, type: WidthType.PERCENTAGE },
@@ -1256,8 +1194,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [banner, bodySplit]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [banner, bodySplit, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1328,6 +1266,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 33, type: WidthType.PERCENTAGE },
@@ -1346,8 +1285,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 500, bottom: 500, left: 0, right: 0 } } },
-                children: [swissHeader, swissBody]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [swissHeader, swissBody, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1413,7 +1352,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: timelineElements
             }]
         });
@@ -1473,6 +1412,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 48, type: WidthType.PERCENTAGE },
@@ -1492,8 +1432,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [infoTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [infoTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1581,6 +1521,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 70, type: WidthType.PERCENTAGE },
@@ -1599,7 +1540,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: [impactHeader, bodySplit]
             }]
         });
@@ -1683,6 +1624,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -1697,8 +1639,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [warmWrap]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [warmWrap, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -1759,6 +1701,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 50, type: WidthType.PERCENTAGE },
@@ -1777,7 +1720,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: [...colHeader, newspaperTable]
             }]
         });
@@ -1855,7 +1798,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: bodyElements
             }]
         });
@@ -1962,6 +1905,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: preset.sidebarWidth || 35, type: WidthType.PERCENTAGE },
@@ -1981,8 +1925,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [layoutTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [layoutTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -2058,6 +2002,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: splitRatio[0], type: WidthType.PERCENTAGE },
@@ -2078,7 +2023,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: docChildren
             }]
         });
@@ -2157,6 +2102,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: SPLIT_BODY_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -2170,8 +2116,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [bannerTable, bodyTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [bannerTable, bodyTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -2250,6 +2196,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: FULL_PAGE_MIN_HEIGHT, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -2264,8 +2211,8 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0 } } },
-                children: [darkTable]
+                properties: { page: { size: PAGE_SIZE_A4, margin: ZERO_MARGINS } },
+                children: [darkTable, createTinyTrailingParagraph()]
             }]
         });
     }
@@ -2330,7 +2277,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
                 children: atsElements
             }]
         });
@@ -2426,6 +2373,7 @@ function buildNativeDocx(cvData) {
             },
             rows: [
                 new TableRow({
+                    height: { value: 14500, rule: HeightRule.ATLEAST },
                     children: [
                         new TableCell({
                             width: { size: 100, type: WidthType.PERCENTAGE },
@@ -2439,7 +2387,7 @@ function buildNativeDocx(cvData) {
 
         return new Document({
             sections: [{
-                properties: { page: { margin: { top: 500, bottom: 500, left: 500, right: 500 } } },
+                properties: { page: { size: PAGE_SIZE_A4, margin: { top: 500, bottom: 500, left: 500, right: 500 } } },
                 children: [goldTable]
             }]
         });
@@ -2447,7 +2395,7 @@ function buildNativeDocx(cvData) {
 
     return new Document({
         sections: [{
-            properties: { page: { margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
+            properties: { page: { size: PAGE_SIZE_A4, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
             children: singleElements
         }]
     });
