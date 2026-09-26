@@ -854,3 +854,285 @@
     color: #fff;
 }
 
+/* ==========================================================================
+   Banner y Modal del Tutorial Paso a Paso con Dulce (API Key)
+   ========================================================================== */
+.apikey-tutorial-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.apikey-tutorial-content {
+    flex: 1;
+    min-width: 200px;
+}
+
+.tutorial-badge {
+    display: inline-block;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.3px;
+}
+
+.apikey-tutorial-content strong {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--color-dark-text);
+}
+
+.apikey-tutorial-content p {
+    font-size: 0.78rem;
+    color: var(--color-muted-text);
+    margin: 0;
+}
+
+.apikey-tutorial-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-tutorial-open {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.85rem;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.btn-tutorial-open:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-tutorial-link {
+    background: var(--color-light-bg);
+    color: var(--color-dark-text);
+    border: 1px solid var(--color-border);
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-tutorial-link:hover {
+    background: var(--color-light-bg-alt);
+}
+
+/* Modal del Tutorial */
+.tutorial-modal-content {
+    max-width: 660px;
+    width: 95%;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    color: var(--color-dark-text);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    position: relative;
+    text-align: left;
+}
+
+.tutorial-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tutorial-mascot-img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid #10b981;
+    object-fit: cover;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.tutorial-header-info h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.tutorial-header-info p {
+    font-size: 0.82rem;
+    color: var(--color-muted-text);
+    margin: 0;
+}
+
+.tutorial-security-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-left: 4px solid #f59e0b;
+    color: #b45309;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.tutorial-security-notice svg {
+    flex-shrink: 0;
+    color: #d97706;
+}
+
+.tutorial-steps-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.step-dot-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    background: var(--color-light-bg);
+    color: var(--color-muted-text);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.step-dot-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.step-dot-btn.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+    transform: scale(1.1);
+}
+
+.tutorial-step-view {
+    background: var(--color-light-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.tutorial-step-body h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: var(--color-dark-text);
+}
+
+.tutorial-step-body p {
+    font-size: 0.88rem;
+    color: var(--color-muted-text);
+    margin-bottom: 1rem;
+    line-height: 1.45;
+}
+
+.tutorial-image-container {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: #000;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.tutorial-image-container img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: contain;
+    display: block;
+    background: #0f172a;
+}
+
+.tutorial-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.tutorial-nav-btns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Soporte Tema Oscuro para Tutorial */
+[data-editor-theme="dark"] .apikey-tutorial-content strong,
+[data-editor-theme="dark"] .tutorial-header-info h3,
+[data-editor-theme="dark"] .tutorial-step-body h4 {
+    color: #f9fafb;
+}
+
+[data-editor-theme="dark"] .tutorial-modal-content {
+    background: #1e2430;
+    color: #e5e7eb;
+}
+
+[data-editor-theme="dark"] .tutorial-modal-header,
+[data-editor-theme="dark"] .tutorial-modal-footer {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-editor-theme="dark"] .tutorial-step-view {
+    background: #111827;
+    border-color: #374151;
+}
+
+[data-editor-theme="dark"] .tutorial-security-notice {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fde68a;
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-editor-theme="dark"] .step-dot-btn {
+    background: #1f2937;
+    border-color: #374151;
+    color: #9ca3af;
+}
+
+[data-editor-theme="dark"] .btn-tutorial-link {
+    background: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+}
+
+

@@ -540,6 +540,129 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar estado del dot
     updateApiKeyUI();
 
+    // ===================================================================
+    // Gestor del Tutorial Interactivo de API Key
+    // ===================================================================
+    const tutorialModal = document.getElementById('ai-tutorial-modal');
+    const openTutorialBtn = document.getElementById('open-apikey-tutorial-btn');
+    const closeTutorialBtn = document.getElementById('tutorial-modal-close');
+    const tutorialPrevBtn = document.getElementById('tutorial-prev-btn');
+    const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+    const tutorialStepTitle = document.getElementById('tutorial-step-title');
+    const tutorialStepDesc = document.getElementById('tutorial-step-desc');
+    const tutorialStepImage = document.getElementById('tutorial-step-image');
+    const stepDotBtns = document.querySelectorAll('.step-dot-btn');
+
+    const TUTORIAL_STEPS = [
+        {
+            step: 1,
+            title: 'Paso 1: Entra a Google AI Studio y pulsa "Crear clave de API"',
+            desc: 'Ingresa a <a href="https://aistudio.google.com/api-keys" target="_blank" class="apikey-help-link">https://aistudio.google.com/api-keys ↗</a> con tu cuenta de Google. En la parte superior verás el botón azul <strong>"Crear clave de API"</strong> (o <em>"Create API key"</em>).',
+            img: 'assets/images/tutorial-apikey/paso-1.jpg'
+        },
+        {
+            step: 2,
+            title: 'Paso 2: Elige tu proyecto o crea uno nuevo',
+            desc: 'En la ventana emergente, selecciona la opción recomendada: <strong>"Crear clave de API en un proyecto nuevo"</strong> (o selecciona un proyecto existente de Google Cloud si ya tienes uno).',
+            img: 'assets/images/tutorial-apikey/paso-2.jpg'
+        },
+        {
+            step: 3,
+            title: 'Paso 3: Espera unos segundos a que se genere tu clave',
+            desc: 'Google procesará tu solicitud de inmediato. Verás un círculo de carga mientras se activa tu clave segura (tarda menos de 5 segundos).',
+            img: 'assets/images/tutorial-apikey/paso-3.jpg'
+        },
+        {
+            step: 4,
+            title: 'Paso 4: Copia tu nueva API Key',
+            desc: 'Aparecerá tu clave secreta (un texto que empieza por <code>AIzaSy...</code>). Haz clic en el botón de <strong>Copiar</strong> para guardarla en tu portapapeles.',
+            img: 'assets/images/tutorial-apikey/paso-4.jpg'
+        },
+        {
+            step: 5,
+            title: 'Paso 5: Pega tu clave en CV Pro IA y pulsa "Guardar y Usar"',
+            desc: 'Regresa a la app, pega tu clave en el campo <strong>"Tu Clave API"</strong> y pulsa <strong>"💾 Guardar y Usar"</strong>. ¡Ya puedes disfrutar de la IA de Google al máximo!',
+            img: 'assets/images/tutorial-apikey/paso-5.jpg'
+        }
+    ];
+
+    let currentTutorialStep = 1;
+
+    function renderTutorialStep(stepIndex) {
+        currentTutorialStep = Math.max(1, Math.min(5, stepIndex));
+        const stepData = TUTORIAL_STEPS[currentTutorialStep - 1];
+
+        if (tutorialStepTitle) tutorialStepTitle.textContent = stepData.title;
+        if (tutorialStepDesc) tutorialStepDesc.innerHTML = stepData.desc;
+        if (tutorialStepImage) {
+            tutorialStepImage.src = stepData.img;
+            tutorialStepImage.alt = stepData.title;
+        }
+
+        stepDotBtns.forEach(btn => {
+            const btnStep = parseInt(btn.dataset.step, 10);
+            if (btnStep === currentTutorialStep) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (tutorialPrevBtn) tutorialPrevBtn.disabled = currentTutorialStep === 1;
+        if (tutorialNextBtn) {
+            if (currentTutorialStep === 5) {
+                tutorialNextBtn.textContent = '¡Listo! Pegar Clave ✔';
+            } else {
+                tutorialNextBtn.textContent = 'Siguiente →';
+            }
+        }
+    }
+
+    function openTutorialModal() {
+        renderTutorialStep(1);
+        if (tutorialModal) tutorialModal.classList.add('show');
+    }
+
+    function closeTutorialModal() {
+        if (tutorialModal) tutorialModal.classList.remove('show');
+    }
+
+    if (openTutorialBtn) openTutorialBtn.addEventListener('click', openTutorialModal);
+    if (closeTutorialBtn) closeTutorialBtn.addEventListener('click', closeTutorialModal);
+    if (tutorialModal) {
+        tutorialModal.addEventListener('click', (e) => {
+            if (e.target === tutorialModal) closeTutorialModal();
+        });
+    }
+
+    if (tutorialPrevBtn) {
+        tutorialPrevBtn.addEventListener('click', () => {
+            if (currentTutorialStep > 1) {
+                renderTutorialStep(currentTutorialStep - 1);
+            }
+        });
+    }
+
+    if (tutorialNextBtn) {
+        tutorialNextBtn.addEventListener('click', () => {
+            if (currentTutorialStep < 5) {
+                renderTutorialStep(currentTutorialStep + 1);
+            } else {
+                closeTutorialModal();
+                if (apiKeyInput) {
+                    apiKeyInput.focus();
+                }
+            }
+        });
+    }
+
+    stepDotBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stepNum = parseInt(btn.dataset.step, 10);
+            if (stepNum) renderTutorialStep(stepNum);
+        });
+    });
+
     // Subida y procesamiento de documentos (PDF / Word)
     if (attachBtn && fileInput) {
         attachBtn.addEventListener('click', () => {

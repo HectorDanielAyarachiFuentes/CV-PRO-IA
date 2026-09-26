@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Cómo obtener tu API Key de Google Gemini Gratis | CV Pro IA</title>
+    <meta name="description"
+        content="Aprende paso a paso cómo conseguir tu propia API Key gratuita en Google AI Studio para usar la inteligencia artificial en CV Pro IA de forma ilimitada y privada.">
+
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='15' fill='%2310b981'%3E%3C/rect%3E%3Ctext x='50' y='55' font-family='Arial, sans-serif' font-size='50' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3E🔑%3C/text%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Source Code Pro', monospace;
+            --primary-green: #10b981;
+            --primary-green-dark: #059669;
+            --bg-page: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --radius-lg: 1rem;
+            --radius-md: 0.5rem;
+            --shadow-glow: 0 10px 30px -10px rgba(16, 185, 129, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-page);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* Top Bar */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+            color: #fff;
+            padding: 0.35rem 0.6rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg-card);
+            color: var(--text-main);
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: var(--bg-card-alt);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Header */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 1.5rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mascot-hero {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-green);
+            box-shadow: var(--shadow-glow);
+            margin: 0 auto 1.25rem;
+            display: block;
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .hero h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 640px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .hero-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+            color: #ffffff;
+            padding: 0.85rem 1.75rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.5);
+            transition: all 0.25s ease;
+        }
+
+        .hero-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.7);
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 640px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .info-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+        }
+
+        .info-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .warning-card {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .warning-card h3 {
+            color: #fbbf24;
+        }
+
+        /* Step Section */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .step-card:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .step-title h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-link-highlight {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            padding: 0.25rem 0.6rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            margin: 0.25rem 0;
+            word-break: break-all;
+        }
+
+        .step-link-highlight:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+
+        .step-image-box {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        .step-image-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .step-image-box:hover img {
+            transform: scale(1.015);
+        }
+
+        /* Footer */
+        .page-footer {
+            margin-top: 4rem;
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-mascot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <a href="index.html" class="brand-link">
+                <span class="brand-badge">🔑 CV Pro IA</span>
+                <span>Tutorial de API Key</span>
+            </a>
+            <a href="index.html" class="btn-back">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Volver al Editor de CV</span>
+            </a>
+        </nav>
+
+        <!-- Hero -->
+        <header class="hero">
+            <img src="assets/images/tutorial-apikey/dulce.png" alt="Dulce con API Key" class="mascot-hero" onerror="this.src='assets/images/about/Dulce.gif'">
+            <h1>Cómo Obtener tu API Key de Google Gemini</h1>
+            <p>Sigue esta guía visual paso a paso para crear tu propia clave gratuita en <strong>Google AI Studio</strong> y disfrutar de IA ilimitada y súper rápida en tu CV.</p>
+            <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer" class="hero-action-btn">
+                <span>Ir a Google AI Studio (aistudio.google.com)</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+        </header>
+
+        <!-- Info Cards -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>💡 ¿Qué es una API Key?</h3>
+                <p>Es como una <strong>llave de acceso personal</strong> que Google te entrega gratuitamente para permitir que la aplicación se comunique con sus modelos de IA (Gemini 2.5 Flash / 1.5 Flash) de forma directa y privada.</p>
+            </div>
+            <div class="info-card warning-card">
+                <h3>🔒 Regla de Oro: Seguridad</h3>
+                <p>Tu API Key es <strong>privada e intransferible</strong>, como la contraseña de tu correo. Nunca la compartas en foros, videos ni con desconocidos. Se guarda únicamente en tu propio navegador.</p>
+            </div>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps-container">
+            <!-- Paso 1 -->
+            <article class="step-card">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">
+                        <h2>Ingresa a Google AI Studio y presiona "Crear clave de API"</h2>
+                    </div>
+                </div>
+                <p class="step-desc">
+                    Entra en <a href="https://aistudio.google.com/api-keys" target="_blank" class="step-link-highlight">https://aistudio.google.com/api-keys ↗</a> con tu cuenta de Google. En la parte superior verás el botón azul <strong>"Crear clave de API"</strong> (o <em>"Create API key"</em>).
+                </p>
+                <div class="step-image-box">
+                    <img src="assets/images/tutorial-apikey/paso-1.jpg" alt="Paso 1: Ir a crear clave en Google AI Studio">
+                </div>
+            </article>
+
+            <!-- Paso 2 -->
+            <article class="step-card">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">
+                        <h2>Elige tu proyecto o crea uno nuevo</h2>
+                    </div>
+                </div>
+                <p class="step-desc">
+                    En la ventana emergente, selecciona la opción recomendada: <strong>"Crear clave de API en un proyecto nuevo"</strong> (o elige un proyecto existente si ya tienes uno).
+                </p>
+                <div class="step-image-box">
+                    <img src="assets/images/tutorial-apikey/paso-2.jpg" alt="Paso 2: Crear clave en proyecto nuevo">
+                </div>
+            </article>
+
+            <!-- Paso 3 -->
+            <article class="step-card">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">
+                        <h2>Espera unos segundos a que se genere tu clave</h2>
+                    </div>
+                </div>
+                <p class="step-desc">
+                    Google procesará la solicitud en menos de 5 segundos. Verás un círculo de carga mientras se activa tu clave segura.
+                </p>
+                <div class="step-image-box">
+                    <img src="assets/images/tutorial-apikey/paso-3.jpg" alt="Paso 3: Esperar a que se cree la clave">
+                </div>
+            </article>
+
+            <!-- Paso 4 -->
+            <article class="step-card">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">
+                        <h2>Copia tu nueva API Key</h2>
+                    </div>
+                </div>
+                <p class="step-desc">
+                    Aparecerá tu clave secreta (un texto largo que empieza por <code>AIzaSy...</code>). Haz clic en el botón de <strong>Copiar</strong> para guardarla en tu portapapeles.
+                </p>
+                <div class="step-image-box">
+                    <img src="assets/images/tutorial-apikey/paso-4.jpg" alt="Paso 4: Copiar la clave">
+                </div>
+            </article>
+
+            <!-- Paso 5 -->
+            <article class="step-card">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">
+                        <h2>Pega tu clave en CV Pro IA y haz clic en "Guardar y Usar"</h2>
+                    </div>
+                </div>
+                <p class="step-desc">
+                    Regresa a la aplicación, abre el botón verde <strong>"🔑 API Key IA"</strong> en la barra superior, pega tu clave en el campo correspondiente y pulsa <strong>"💾 Guardar y Usar"</strong>. ¡Ya puedes crear y mejorar tu currículum con toda la potencia de la IA!
+                </p>
+                <div class="step-image-box">
+                    <img src="assets/images/tutorial-apikey/paso-5.jpg" alt="Paso 5: Pegar en CV Pro IA y guardar">
+                </div>
+            </article>
+        </div>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p>CV Pro IA — Generador de Currículums con Inteligencia Artificial</p>
+            <div class="footer-mascot">
+                <span>Creado con ❤️ por Hector Daniel y Dulce</span> 🐾
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

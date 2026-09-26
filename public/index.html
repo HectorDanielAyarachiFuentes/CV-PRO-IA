@@ -550,6 +550,21 @@
 
             <div id="apikey-status-banner" class="apikey-status-banner"></div>
 
+            <!-- Banner Guía con Dulce -->
+            <div class="apikey-tutorial-banner">
+                <div class="apikey-tutorial-content">
+                    <span class="tutorial-badge">🐾 Dulce te enseña</span>
+                    <strong>¿No sabes cómo conseguir tu API Key?</strong>
+                    <p>Aprende en 5 pasos sencillos y visuales con capturas reales.</p>
+                </div>
+                <div class="apikey-tutorial-actions">
+                    <button type="button" id="open-apikey-tutorial-btn" class="btn-tutorial-open">
+                        📖 Ver Guía Paso a Paso
+                    </button>
+                    <a href="tutorial-apikey.html" target="_blank" class="btn-tutorial-link" title="Abrir tutorial completo en pestaña nueva">↗</a>
+                </div>
+            </div>
+
             <form id="apikey-form" onsubmit="return false;">
                 <div class="apikey-form-group">
                     <label for="apikey-provider-select">Proveedor de Inteligencia Artificial:</label>
@@ -573,7 +588,7 @@
                         </div>
                         <div class="apikey-help-box">
                             <span id="apikey-help-desc">¿No tienes una clave?</span>
-                            <a id="apikey-help-link" class="apikey-help-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
+                            <a id="apikey-help-link" class="apikey-help-link" href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">
                                 Obtener API Key gratis en Google AI Studio ↗
                             </a>
                         </div>
@@ -597,6 +612,60 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal de Tutorial Interactivo Paso a Paso con Dulce -->
+    <div id="ai-tutorial-modal" class="modal-overlay">
+        <div class="modal-content tutorial-modal-content">
+            <button id="tutorial-modal-close" class="apikey-modal-close" title="Cerrar tutorial">&times;</button>
+            
+            <div class="tutorial-modal-header">
+                <img src="assets/images/tutorial-apikey/dulce.png" alt="Dulce" class="tutorial-mascot-img" onerror="this.src='assets/images/about/Dulce.gif'">
+                <div class="tutorial-header-info">
+                    <h3>Guía Ilustrada: Cómo obtener tu API Key</h3>
+                    <p>Sigue estos 5 sencillos pasos para activar tu IA gratuita en Google AI Studio.</p>
+                </div>
+            </div>
+
+            <!-- Seguridad / Callout -->
+            <div class="tutorial-security-notice">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span><strong>Seguridad:</strong> Tu API Key es como una contraseña privada. <u>Nunca la compartas</u> con nadie.</span>
+            </div>
+
+            <!-- Indicadores de Paso -->
+            <div class="tutorial-steps-indicator">
+                <button type="button" class="step-dot-btn active" data-step="1"><span>1</span></button>
+                <button type="button" class="step-dot-btn" data-step="2"><span>2</span></button>
+                <button type="button" class="step-dot-btn" data-step="3"><span>3</span></button>
+                <button type="button" class="step-dot-btn" data-step="4"><span>4</span></button>
+                <button type="button" class="step-dot-btn" data-step="5"><span>5</span></button>
+            </div>
+
+            <!-- Contenedor del Paso Activo -->
+            <div class="tutorial-step-view">
+                <div class="tutorial-step-body">
+                    <h4 id="tutorial-step-title">Paso 1: Entra a Google AI Studio y pulsa "Crear clave de API"</h4>
+                    <p id="tutorial-step-desc">
+                        Ingresa a <a href="https://aistudio.google.com/api-keys" target="_blank" class="apikey-help-link">https://aistudio.google.com/api-keys ↗</a> e inicia sesión con tu cuenta de Google. Pulsa el botón azul <strong>"Crear clave de API"</strong> (o <em>"Create API key"</em>).
+                    </p>
+                    <div class="tutorial-image-container">
+                        <img id="tutorial-step-image" src="assets/images/tutorial-apikey/paso-1.jpg" alt="Paso tutorial">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer con Navegación -->
+            <div class="tutorial-modal-footer">
+                <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+                    🚀 Abrir Google AI Studio ↗
+                </a>
+                <div class="tutorial-nav-btns">
+                    <button type="button" id="tutorial-prev-btn" class="btn btn-secondary btn-sm" disabled>← Anterior</button>
+                    <button type="button" id="tutorial-next-btn" class="btn btn-apikey btn-sm">Siguiente →</button>
+                </div>
+            </div>
         </div>
     </div>
 
