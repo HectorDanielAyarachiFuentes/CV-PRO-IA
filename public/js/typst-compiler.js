@@ -50,6 +50,7 @@ const TypstCompiler = (() => {
   const buildTypstSections = (cvData) => {
     let output = '';
     const { sectionOrder, personalInfo, experience, education, skills, impacts, portfolio, themeColor, textColorDark } = cvData;
+    const textColorMuted = cvData.textColorMuted || '#6c757d';
 
     const levelLabels = {
       beginner: 'Principiante',
@@ -148,7 +149,12 @@ ${edu.description ? escapeTypst(edu.description).replace(/\n/g, ' \\ ') : ''}
   // Generar Código Fuente Completo de Typst (.typ)
   const generateTypstSource = (cvData, layoutKey = 'classic', customTemplates = null) => {
     const templatesMap = customTemplates || typstTemplates;
-    let templateRaw = templatesMap[layoutKey] || templatesMap['classic'] || '';
+    const selectedLayout = layoutKey || cvData.layout || 'classic';
+    let templateRaw = templatesMap[selectedLayout] || templatesMap['classic'] || '';
+
+    const fullName = (window.CvApp && window.CvApp.templateHelpers)
+      ? window.CvApp.templateHelpers.getFullName(cvData.personalInfo)
+      : `${cvData.personalInfo?.firstName || ''} ${cvData.personalInfo?.lastName || ''}`.trim();
 
     const initials = (cvData.avatar?.type === 'initials' && cvData.avatar?.value)
       ? cvData.avatar.value
@@ -178,13 +184,19 @@ ${edu.description ? escapeTypst(edu.description).replace(/\n/g, ' \\ ') : ''}
   };
 
   // Descarga del código fuente Typst (.typ)
-  const downloadTypstFile = (cvData, layoutKey) => {
-    const code = generateTypstSource(cvData, layoutKey);
+  const downloadTypstFile = async (cvData, layoutKey) => {
+    if (!typstTemplates || Object.keys(typstTemplates).length === 0) {
+      await loadTypstTemplates();
+    }
+    const layout = layoutKey || cvData.layout || 'classic';
+    const code = generateTypstSource(cvData, layout);
     const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `CV_${cvData.personalInfo?.lastName || 'Typst'}.typ`;
+    const firstName = cvData.personalInfo?.firstName || 'CV';
+    const lastName = cvData.personalInfo?.lastName || 'Documento';
+    a.download = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}_${layout}.typ`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

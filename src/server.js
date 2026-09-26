@@ -2,8 +2,13 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
+const { exec } = require('child_process');
 const multer = require('multer');
 const mammoth = require('mammoth');
+const { Packer } = require('docx');
+const { buildNativeDocx } = require('./docxBuilder');
 require('dotenv').config(); // Carga las claves desde el archivo .env
 
 const app = express();
@@ -568,6 +573,30 @@ app.post('/api/upload-cv', upload.single('cvFile'), async (req, res) => {
     } catch (error) {
         console.error("Error procesando archivo:", error);
         res.status(500).json({ error: 'Error al procesar el archivo CV.' });
+    }
+});
+
+// --- ENDPOINT EXPORTACIÓN DOCX NATIVO MULTI-PLANTILLA ---
+app.post('/api/export/docx', async (req, res) => {
+    try {
+        const { cvData } = req.body;
+        if (!cvData) {
+            return res.status(400).json({ error: 'Faltan datos del CV.' });
+        }
+
+        const doc = buildNativeDocx(cvData);
+        const docxBuffer = await Packer.toBuffer(doc);
+
+        const p = cvData.personalInfo || {};
+        const firstName = (p.firstName || 'CV').replace(/ /g, '_');
+        const lastName = (p.lastName || 'Profesional').replace(/ /g, '_');
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        res.setHeader('Content-Disposition', `attachment; filename="CV_${firstName}_${lastName}.docx"`);
+        res.send(docxBuffer);
+    } catch (err) {
+        console.error('Error en endpoint /api/export/docx:', err);
+        res.status(500).json({ error: 'Error generando documento Word: ' + err.message });
     }
 });
 

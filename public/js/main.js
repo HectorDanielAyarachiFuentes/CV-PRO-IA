@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadPdfBtn = document.getElementById('download-pdf-btn');
     const downloadHtmlBtn = document.getElementById('download-html-btn');
     const downloadTypstBtn = document.getElementById('download-typst-btn');
+    const downloadWordBtn = document.getElementById('download-word-btn');
     const resetCvBtn = document.getElementById('reset-cv-btn');
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const toggleFullscreenBtn = document.getElementById('toggle-fullscreen-btn');
@@ -576,6 +577,9 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadHtmlBtn.addEventListener('click', CvApp.exporter.downloadHtml);
         if (downloadTypstBtn) {
             downloadTypstBtn.addEventListener('click', CvApp.exporter.downloadTypst);
+        }
+        if (downloadWordBtn) {
+            downloadWordBtn.addEventListener('click', CvApp.exporter.downloadWord);
         }
         shareCvBtn.addEventListener('click', CvApp.exporter.shareCv);
         themeToggleBtn.addEventListener('click', handleThemeToggle);
