@@ -96,20 +96,227 @@ function cleanExtractedText(text, maxChars = 7500) {
     return cleaned;
 }
 
+// Helper para formatear mensajes respetando las reglas de Gemini (alternancia estricta user <-> model)
+function formatMessagesForGemini(messages) {
+    let systemInstructionText = '';
+    const rawTurns = [];
+
+    for (const msg of messages) {
+        if (!msg || msg.content === undefined || msg.content === null) continue;
+        const text = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+        if (!text.trim()) continue;
+
+        if (msg.role === 'system') {
+            systemInstructionText += (systemInstructionText ? '\n\n' : '') + text;
+        } else {
+            const role = (msg.role === 'assistant' || msg.role === 'model') ? 'model' : 'user';
+            rawTurns.push({ role, text });
+        }
+    }
+
+    if (rawTurns.length === 0) {
+        rawTurns.push({ role: 'user', text: 'Hola' });
+    }
+
+    // Unir mensajes consecutivos con el mismo rol (Gemini no permite dos user consecutivos)
+    const mergedContents = [];
+    for (const turn of rawTurns) {
+        if (mergedContents.length > 0 && mergedContents[mergedContents.length - 1].role === turn.role) {
+            mergedContents[mergedContents.length - 1].parts.push({ text: turn.text });
+        } else {
+            mergedContents.push({
+                role: turn.role,
+                parts: [{ text: turn.text }]
+            });
+        }
+    }
+
+    // Gemini exige que el primer mensaje de la conversación sea 'user'
+    if (mergedContents.length > 0 && mergedContents[0].role !== 'user') {
+        mergedContents.unshift({ role: 'user', parts: [{ text: 'Hola' }] });
+    }
+
+    return { systemInstructionText, contents: mergedContents };
+}
+
+// Helper para llamar nativamente a la API de Google Gemini (Google AI Studio)
+async function callGeminiNative({ apiKey, model, messages, temperature = 0.2, maxTokens = 3000 }) {
+    const cleanApiKey = apiKey.trim();
+    const { systemInstructionText, contents } = formatMessagesForGemini(messages);
+
+    const payload = {
+        contents: contents,
+        generationConfig: {
+            temperature: temperature,
+            maxOutputTokens: maxTokens
+        }
+    };
+
+    if (systemInstructionText) {
+        payload.systemInstruction = {
+            parts: [{ text: systemInstructionText }]
+        };
+    }
+
+    // 1. Obtener lista de modelos disponibles para esta API Key dinámicamente de Google
+    let availableModels = [];
+    try {
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanApiKey}`);
+        if (listRes.ok) {
+            const listData = await listRes.json();
+            if (listData.models && Array.isArray(listData.models)) {
+                availableModels = listData.models
+                    .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
+                    .map(m => m.name.replace('models/', ''));
+            }
+        }
+    } catch (e) {
+        console.warn("[Gemini] No se pudo consultar lista dinámica de modelos:", e.message);
+    }
+
+    // 2. Ordenar candidatos priorizando el modelo solicitado, luego los flash disponibles, luego los fallbacks estándar
+    const requested = (model && model.trim() !== '') ? model.trim() : '';
+    const candidateModels = Array.from(new Set([
+        requested,
+        ...availableModels.filter(m => m.includes('flash')),
+        ...availableModels,
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-pro',
+        'gemini-pro'
+    ])).filter(Boolean);
+
+    let lastError = null;
+
+    for (const currentModel of candidateModels) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${cleanApiKey}`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                lastError = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+                console.warn(`[Gemini] Modelo ${currentModel} falló (${lastError}). Intentando siguiente modelo compatible...`);
+                continue;
+            }
+
+            const data = await response.json();
+            const candidate = data.candidates?.[0];
+            const textContent = candidate?.content?.parts?.map(p => p.text).join('') || '';
+
+            console.log(`[Gemini] Respuesta generada exitosamente con modelo: ${currentModel}`);
+            return {
+                choices: [
+                    {
+                        message: {
+                            role: 'assistant',
+                            content: textContent
+                        }
+                    }
+                ]
+            };
+        } catch (err) {
+            lastError = err.message;
+            console.warn(`[Gemini] Error con modelo ${currentModel}: ${err.message}. Probando siguiente...`);
+        }
+    }
+
+    throw new Error(`[GEMINI] ${lastError}`);
+}
+
+// Helper para llamar a proveedores de IA personalizados (Google AI Studio, Groq, OpenAI, DeepSeek)
+async function callCustomAI({ provider = 'gemini', apiKey, model, messages, temperature = 0.2, maxTokens = 3000 }) {
+    if (provider === 'gemini') {
+        return await callGeminiNative({ apiKey, model, messages, temperature, maxTokens });
+    }
+
+    let endpoint = '';
+    let defaultModel = '';
+
+    switch (provider) {
+        case 'openai':
+            endpoint = 'https://api.openai.com/v1/chat/completions';
+            defaultModel = 'gpt-4o-mini';
+            break;
+        case 'deepseek':
+            endpoint = 'https://api.deepseek.com/v1/chat/completions';
+            defaultModel = 'deepseek-chat';
+            break;
+        case 'groq':
+        default:
+            endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+            defaultModel = 'llama-3.3-70b-versatile';
+            break;
+    }
+
+    const selectedModel = model && model.trim() !== '' ? model.trim() : defaultModel;
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey.trim()}`
+        },
+        body: JSON.stringify({
+            model: selectedModel,
+            messages: messages,
+            temperature: temperature,
+            max_tokens: maxTokens
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const msg = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(`[${provider.toUpperCase()}] ${msg}`);
+    }
+
+    return await response.json();
+}
+
+// Endpoint para probar rápidamente una API Key
+app.post('/api/test-key', async (req, res) => {
+    try {
+        const { provider = 'gemini', apiKey = '', model = '' } = req.body;
+        if (!apiKey || apiKey.trim() === '') {
+            return res.status(400).json({ ok: false, error: 'Por favor proporciona una API Key válida.' });
+        }
+
+        const testMessages = [
+            { role: 'user', content: 'Responde únicamente con la palabra OK si estás funcionando.' }
+        ];
+
+        const result = await callCustomAI({
+            provider,
+            apiKey,
+            model,
+            messages: testMessages,
+            maxTokens: 50
+        });
+
+        const reply = result.choices?.[0]?.message?.content || 'OK';
+        res.json({
+            ok: true,
+            provider,
+            model: model || (provider === 'gemini' ? 'gemini-2.0-flash' : (provider === 'openai' ? 'gpt-4o-mini' : 'llama-3.3-70b-versatile')),
+            reply: reply.trim()
+        });
+    } catch (error) {
+        res.status(400).json({ ok: false, error: error.message });
+    }
+});
+
 // Endpoint de Chat con la IA
 app.post('/api/chat', async (req, res) => {
     try {
-        const { question = '', mode = 'cv-generator', history = [], currentCv = null } = req.body;
-
-        // Lee todas las claves configuradas que empiecen por GROQ_API_KEY
-        const groqApiKeys = Object.keys(process.env)
-            .filter(key => key.startsWith('GROQ_API_KEY'))
-            .map(key => process.env[key])
-            .filter(Boolean);
-
-        if (groqApiKeys.length === 0) {
-            return res.status(500).json({ error: 'No hay claves de API (GROQ_API_KEY) configuradas en el archivo .env.' });
-        }
+        const { question = '', mode = 'cv-generator', history = [], currentCv = null, customConfig = null } = req.body;
 
         // Saneamiento de historial: últimos 4 intercambios y truncado de mensajes previos gigantes
         const sanitizedHistory = (Array.isArray(history) ? history.slice(-4) : []).map(msg => ({
@@ -163,6 +370,30 @@ Si aún estás recolectando información y no es momento de actualizar el docume
                 ...sanitizedHistory,
                 { role: "user", content: sanitizedQuestion }
             ];
+        }
+
+        // 1. Si el usuario envía su propia API Key (Google AI Studio, Groq, OpenAI, DeepSeek)
+        if (customConfig && customConfig.apiKey && customConfig.apiKey.trim() !== '' && customConfig.provider !== 'server') {
+            console.log(`[API Chat] Usando proveedor personalizado: ${customConfig.provider} (Modelo: ${customConfig.model || 'default'})`);
+            const customResult = await callCustomAI({
+                provider: customConfig.provider,
+                apiKey: customConfig.apiKey,
+                model: customConfig.model,
+                messages: messages,
+                temperature: 0.2,
+                maxTokens: 3000
+            });
+            return res.json(customResult);
+        }
+
+        // 2. Si no hay clave personalizada, usar pool de claves por defecto del servidor (.env)
+        const groqApiKeys = Object.keys(process.env)
+            .filter(key => key.startsWith('GROQ_API_KEY'))
+            .map(key => process.env[key])
+            .filter(Boolean);
+
+        if (groqApiKeys.length === 0) {
+            return res.status(500).json({ error: 'No hay claves de API (GROQ_API_KEY) configuradas en el servidor. Puedes configurar tu propia API Key con el botón superior "API Key IA".' });
         }
 
         // Lista de modelos de contingencia ordenados: Qwen 3.8/3.6, GPT OSS y Llama
@@ -219,7 +450,7 @@ Si aún estás recolectando información y no es momento de actualizar el docume
         }
 
         if (!data) {
-            throw new Error(`Se agotaron los tokens en todas las claves y modelos. Último error: ${ultimoError}`);
+            throw new Error(`Se agotaron los tokens en todas las claves y modelos del servidor. Configura tu propia clave gratuita con el botón "API Key IA". Último error: ${ultimoError}`);
         }
 
         res.json(data);

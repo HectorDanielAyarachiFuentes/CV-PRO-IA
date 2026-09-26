@@ -601,3 +601,256 @@
     background: rgba(0,0,0,0.4);
     transform: rotate(90deg);
 }
+
+/* ==========================================================================
+   Estilos para el Modal de Configuración de API Key (BYOK)
+   ========================================================================== */
+.apikey-modal-content {
+    max-width: 540px;
+    width: 92%;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    color: var(--color-dark-text);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06);
+    position: relative;
+    text-align: left;
+}
+
+.apikey-modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.apikey-modal-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.apikey-modal-titles h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--color-dark-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.apikey-modal-titles p {
+    font-size: 0.85rem;
+    color: var(--color-muted-text);
+    line-height: 1.4;
+}
+
+.apikey-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--color-muted-text);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.apikey-modal-close:hover {
+    background: var(--color-light-bg-alt);
+    color: var(--color-dark-text);
+}
+
+.apikey-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.apikey-form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--color-dark-text);
+}
+
+.apikey-form-group select,
+.apikey-form-group input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-light-bg);
+    color: var(--color-dark-text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.apikey-form-group select:focus,
+.apikey-form-group input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.apikey-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.apikey-input-container input {
+    padding-right: 2.8rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.85rem;
+}
+
+.apikey-toggle-eye {
+    position: absolute;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    color: var(--color-muted-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.apikey-toggle-eye:hover {
+    color: var(--color-dark-text);
+}
+
+.apikey-help-box {
+    margin-top: 0.45rem;
+    font-size: 0.8rem;
+    color: var(--color-muted-text);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.apikey-help-link {
+    color: #059669;
+    text-decoration: underline;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.apikey-help-link:hover {
+    color: #047857;
+}
+
+.apikey-status-banner {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    margin-bottom: 1.25rem;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.apikey-status-banner.success {
+    display: flex;
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.apikey-status-banner.error {
+    display: flex;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.apikey-status-banner.loading {
+    display: flex;
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+.apikey-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.apikey-footer-left {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.apikey-footer-right {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Soporte Tema Oscuro para el Modal de API Key */
+[data-editor-theme="dark"] .apikey-modal-content {
+    background: #1e2430;
+    color: #e5e7eb;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+[data-editor-theme="dark"] .apikey-modal-header,
+[data-editor-theme="dark"] .apikey-modal-footer {
+    border-color: rgba(255,255,255,0.1);
+}
+
+[data-editor-theme="dark"] .apikey-modal-titles h3,
+[data-editor-theme="dark"] .apikey-form-group label {
+    color: #f9fafb;
+}
+
+[data-editor-theme="dark"] .apikey-form-group select,
+[data-editor-theme="dark"] .apikey-form-group input {
+    background: #111827;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+[data-editor-theme="dark"] .apikey-form-group select:focus,
+[data-editor-theme="dark"] .apikey-form-group input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+[data-editor-theme="dark"] .apikey-help-link {
+    color: #34d399;
+}
+
+[data-editor-theme="dark"] .apikey-modal-close:hover {
+    background: #374151;
+    color: #fff;
+}
+

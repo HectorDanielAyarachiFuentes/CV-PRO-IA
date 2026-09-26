@@ -249,6 +249,297 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('aiChatHistory', JSON.stringify(chatHistory.slice(-10)));
     }
 
+    // ===================================================================
+    // Gestor de Configuración de API Key (BYOK - Multi-Proveedor)
+    // ===================================================================
+    const apiKeyBtn = document.getElementById('ai-apikey-btn');
+    const apiKeyModal = document.getElementById('ai-apikey-modal');
+    const apiKeyModalClose = document.getElementById('apikey-modal-close');
+    const apiKeyProviderSelect = document.getElementById('apikey-provider-select');
+    const apiKeyInput = document.getElementById('apikey-input');
+    const apiKeyModelSelect = document.getElementById('apikey-model-select');
+    const apiKeyToggleEye = document.getElementById('apikey-toggle-eye');
+    const apiKeyHelpDesc = document.getElementById('apikey-help-desc');
+    const apiKeyHelpLink = document.getElementById('apikey-help-link');
+    const apiKeyStatusBanner = document.getElementById('apikey-status-banner');
+    const apiKeyTestBtn = document.getElementById('apikey-test-btn');
+    const apiKeySaveBtn = document.getElementById('apikey-save-btn');
+    const apiKeyClearBtn = document.getElementById('apikey-clear-btn');
+    const apiKeyStatusDot = document.getElementById('ai-key-status-dot');
+    const apiKeyCredentialsFields = document.getElementById('apikey-credentials-fields');
+
+    const PROVIDER_CONFIGS = {
+        gemini: {
+            name: 'Google AI Studio (Gemini)',
+            helpText: 'Obtener API Key gratis en Google AI Studio ↗',
+            helpUrl: 'https://aistudio.google.com/app/apikey',
+            placeholder: 'Ej: AIzaSy...',
+            models: [
+                { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash (Recomendado - Última generación)' },
+                { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Rápido y estable)' },
+                { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (Máxima capacidad)' },
+                { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Razonamiento profundo)' }
+            ]
+        },
+        groq: {
+            name: 'Groq Cloud',
+            helpText: 'Obtener API Key gratis en Groq Console ↗',
+            helpUrl: 'https://console.groq.com/keys',
+            placeholder: 'Ej: gsk_...',
+            models: [
+                { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile (Recomendado)' },
+                { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant (Ultra rápido)' },
+                { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B' },
+                { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B' }
+            ]
+        },
+        openai: {
+            name: 'OpenAI',
+            helpText: 'Obtener API Key en OpenAI Platform ↗',
+            helpUrl: 'https://platform.openai.com/api-keys',
+            placeholder: 'Ej: sk-proj-...',
+            models: [
+                { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Recomendado)' },
+                { id: 'gpt-4o', name: 'GPT-4o (Alta precisión)' }
+            ]
+        },
+        deepseek: {
+            name: 'DeepSeek',
+            helpText: 'Obtener API Key en DeepSeek Platform ↗',
+            helpUrl: 'https://platform.deepseek.com/api_keys',
+            placeholder: 'Ej: sk-...',
+            models: [
+                { id: 'deepseek-chat', name: 'DeepSeek Chat (V3)' },
+                { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner (R1)' }
+            ]
+        },
+        server: {
+            name: 'Servidor por defecto',
+            helpText: '',
+            helpUrl: '',
+            placeholder: '',
+            models: []
+        }
+    };
+
+    function getCustomAiConfig() {
+        try {
+            const raw = localStorage.getItem('cv_custom_ai_config');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.provider && parsed.provider !== 'server' && parsed.apiKey) {
+                    return parsed;
+                }
+            }
+        } catch (e) {
+            console.error("Error leyendo custom AI config:", e);
+        }
+        return null;
+    }
+
+    function updateApiKeyUI() {
+        const config = getCustomAiConfig();
+        if (apiKeyStatusDot) {
+            if (config && config.apiKey) {
+                apiKeyStatusDot.classList.add('active');
+                if (apiKeyBtn) apiKeyBtn.title = `🔑 Clave Activa: ${PROVIDER_CONFIGS[config.provider]?.name || config.provider}`;
+            } else {
+                apiKeyStatusDot.classList.remove('active');
+                if (apiKeyBtn) apiKeyBtn.title = '🔑 Configurar tu propia API Key de IA (Google AI Studio, Groq, OpenAI)';
+            }
+        }
+    }
+
+    function renderProviderModels(provider, selectedModel = null) {
+        if (!apiKeyModelSelect) return;
+        apiKeyModelSelect.innerHTML = '';
+        const provData = PROVIDER_CONFIGS[provider] || PROVIDER_CONFIGS.gemini;
+
+        if (provider === 'server' || provData.models.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Modelo gestionado por el servidor';
+            apiKeyModelSelect.appendChild(opt);
+            return;
+        }
+
+        provData.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id;
+            opt.textContent = m.name;
+            if (selectedModel && selectedModel === m.id) {
+                opt.selected = true;
+            }
+            apiKeyModelSelect.appendChild(opt);
+        });
+    }
+
+    function onProviderChanged() {
+        const provider = apiKeyProviderSelect.value;
+        const provData = PROVIDER_CONFIGS[provider] || PROVIDER_CONFIGS.gemini;
+
+        if (provider === 'server') {
+            if (apiKeyCredentialsFields) apiKeyCredentialsFields.style.display = 'none';
+        } else {
+            if (apiKeyCredentialsFields) apiKeyCredentialsFields.style.display = 'block';
+            if (apiKeyInput) apiKeyInput.placeholder = provData.placeholder;
+            if (apiKeyHelpLink) {
+                apiKeyHelpLink.textContent = provData.helpText;
+                apiKeyHelpLink.href = provData.helpUrl;
+            }
+            renderProviderModels(provider);
+        }
+        hideStatusBanner();
+    }
+
+    function showStatusBanner(msg, type = 'loading') {
+        if (!apiKeyStatusBanner) return;
+        apiKeyStatusBanner.className = `apikey-status-banner ${type}`;
+        apiKeyStatusBanner.innerHTML = msg;
+    }
+
+    function hideStatusBanner() {
+        if (!apiKeyStatusBanner) return;
+        apiKeyStatusBanner.className = 'apikey-status-banner';
+        apiKeyStatusBanner.style.display = 'none';
+    }
+
+    function openApiKeyModal() {
+        hideStatusBanner();
+        const saved = getCustomAiConfig();
+        if (saved) {
+            apiKeyProviderSelect.value = saved.provider || 'gemini';
+            if (apiKeyInput) apiKeyInput.value = saved.apiKey || '';
+            renderProviderModels(saved.provider, saved.model);
+        } else {
+            apiKeyProviderSelect.value = 'gemini';
+            if (apiKeyInput) apiKeyInput.value = '';
+            renderProviderModels('gemini');
+        }
+        onProviderChanged();
+        if (apiKeyModal) apiKeyModal.classList.add('show');
+    }
+
+    function closeApiKeyModal() {
+        if (apiKeyModal) apiKeyModal.classList.remove('show');
+    }
+
+    if (apiKeyBtn) apiKeyBtn.addEventListener('click', openApiKeyModal);
+    if (apiKeyModalClose) apiKeyModalClose.addEventListener('click', closeApiKeyModal);
+    if (apiKeyModal) {
+        apiKeyModal.addEventListener('click', (e) => {
+            if (e.target === apiKeyModal) closeApiKeyModal();
+        });
+    }
+
+    if (apiKeyProviderSelect) {
+        apiKeyProviderSelect.addEventListener('change', onProviderChanged);
+    }
+
+    if (apiKeyToggleEye && apiKeyInput) {
+        apiKeyToggleEye.addEventListener('click', () => {
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                apiKeyToggleEye.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+            } else {
+                apiKeyInput.type = 'password';
+                apiKeyToggleEye.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+            }
+        });
+    }
+
+    // Probar conexión
+    if (apiKeyTestBtn) {
+        apiKeyTestBtn.addEventListener('click', async () => {
+            const provider = apiKeyProviderSelect.value;
+            const apiKey = apiKeyInput.value.trim();
+            const model = apiKeyModelSelect.value;
+
+            if (provider !== 'server' && !apiKey) {
+                showStatusBanner('⚠️ Por favor ingresa una API Key antes de probar.', 'error');
+                return;
+            }
+
+            if (provider === 'server') {
+                showStatusBanner('ℹ️ El modo servidor utiliza el backend por defecto.', 'loading');
+                return;
+            }
+
+            showStatusBanner('⏳ Probando conexión con ' + (PROVIDER_CONFIGS[provider]?.name || provider) + '...', 'loading');
+            apiKeyTestBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/test-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider, apiKey, model })
+                });
+
+                const data = await res.json();
+                if (data.ok) {
+                    showStatusBanner(`✅ ¡Conexión exitosa! El modelo <strong>${data.model}</strong> respondió correctamente.`, 'success');
+                } else {
+                    showStatusBanner(`❌ Error al conectar: ${data.error}`, 'error');
+                }
+            } catch (err) {
+                showStatusBanner(`❌ Error de red: ${err.message}`, 'error');
+            } finally {
+                apiKeyTestBtn.disabled = false;
+            }
+        });
+    }
+
+    // Guardar configuración
+    if (apiKeySaveBtn) {
+        apiKeySaveBtn.addEventListener('click', () => {
+            const provider = apiKeyProviderSelect.value;
+            const apiKey = apiKeyInput.value.trim();
+            const model = apiKeyModelSelect.value;
+
+            if (provider !== 'server' && !apiKey) {
+                showStatusBanner('⚠️ Debes ingresar una API Key válida o seleccionar "Servidor por defecto".', 'error');
+                return;
+            }
+
+            if (provider === 'server') {
+                localStorage.removeItem('cv_custom_ai_config');
+                updateApiKeyUI();
+                closeApiKeyModal();
+                if (window.CvApp && typeof window.CvApp.showToast === 'function') {
+                    window.CvApp.showToast('Configuración guardada: usando claves del servidor', 'info');
+                }
+                return;
+            }
+
+            const config = { provider, apiKey, model };
+            localStorage.setItem('cv_custom_ai_config', JSON.stringify(config));
+            updateApiKeyUI();
+            closeApiKeyModal();
+
+            if (window.CvApp && typeof window.CvApp.showToast === 'function') {
+                window.CvApp.showToast(`¡Configuración de ${PROVIDER_CONFIGS[provider]?.name || provider} guardada y activa!`, 'success');
+            }
+        });
+    }
+
+    // Limpiar / Quitar Clave
+    if (apiKeyClearBtn) {
+        apiKeyClearBtn.addEventListener('click', () => {
+            localStorage.removeItem('cv_custom_ai_config');
+            if (apiKeyInput) apiKeyInput.value = '';
+            if (apiKeyProviderSelect) apiKeyProviderSelect.value = 'server';
+            onProviderChanged();
+            updateApiKeyUI();
+            closeApiKeyModal();
+            if (window.CvApp && typeof window.CvApp.showToast === 'function') {
+                window.CvApp.showToast('Clave eliminada. Ahora se usarán las claves automáticas del servidor.', 'info');
+            }
+        });
+    }
+
+    // Inicializar estado del dot
+    updateApiKeyUI();
+
     // Subida y procesamiento de documentos (PDF / Word)
     if (attachBtn && fileInput) {
         attachBtn.addEventListener('click', () => {
@@ -296,7 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         question: aiPrompt,
                         mode: 'cv-generator',
                         history: chatHistory.slice(-4),
-                        currentCv: window.CvApp?.state?.cvData || null
+                        currentCv: window.CvApp?.state?.cvData || null,
+                        customConfig: getCustomAiConfig()
                     })
                 });
 
@@ -340,7 +632,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     question: text,
                     mode: 'cv-generator',
                     history: chatHistory.slice(-4),
-                    currentCv: window.CvApp?.state?.cvData || null
+                    currentCv: window.CvApp?.state?.cvData || null,
+                    customConfig: getCustomAiConfig()
                 })
             });
 
