@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const raw = localStorage.getItem('cv_custom_ai_config');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed && parsed.provider && parsed.provider !== 'server' && parsed.apiKey) {
+                if (parsed && parsed.provider && parsed.provider !== 'server' && parsed.apiKey && parsed.apiKey.trim() !== '') {
                     return parsed;
                 }
             }
@@ -336,6 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null;
     }
+
+    const aiChatProviderBadge = document.getElementById('ai-chat-provider-badge');
 
     function updateApiKeyUI() {
         const config = getCustomAiConfig();
@@ -348,7 +350,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (apiKeyBtn) apiKeyBtn.title = '🔑 Configurar tu propia API Key de IA (Google AI Studio, Groq, OpenAI)';
             }
         }
+
+        if (aiChatProviderBadge) {
+            if (config && config.apiKey) {
+                const pName = PROVIDER_CONFIGS[config.provider]?.name || config.provider;
+                aiChatProviderBadge.textContent = '🟢 ' + pName;
+                aiChatProviderBadge.classList.add('custom-active');
+                aiChatProviderBadge.title = `Estás usando tu API Key (${pName}). Clic para cambiar.`;
+            } else {
+                aiChatProviderBadge.textContent = '🖥️ Servidor';
+                aiChatProviderBadge.classList.remove('custom-active');
+                aiChatProviderBadge.title = 'Estás usando la IA del servidor de la página. Clic para usar tu propia clave.';
+            }
+        }
     }
+
+    if (aiChatProviderBadge) {
+        aiChatProviderBadge.addEventListener('click', () => {
+            openApiKeyModal();
+        });
+    }
+
+    function addSystemNotification(htmlText) {
+        const sysDiv = document.createElement('div');
+        sysDiv.className = 'ai-system-msg';
+        sysDiv.innerHTML = htmlText;
+        chatMessages.appendChild(sysDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showInteractiveAiError(errorText, usedCustomConfig) {
+        const errDiv = document.createElement('div');
+        errDiv.className = 'ai-error-interactive';
+
+        if (usedCustomConfig && usedCustomConfig.apiKey) {
+            const pName = PROVIDER_CONFIGS[usedCustomConfig.provider]?.name || 'tu API Key';
+            errDiv.innerHTML = `
+                <div class="ai-error-interactive-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>Error al conectar con ${pName}</span>
+                </div>
+                <div>${errorText}</div>
+                <div class="ai-error-interactive-actions">
+                    <button type="button" class="ai-error-btn primary" onclick="window.CvApp.openApiKeyModal()">⚙️ Configurar otra API Key</button>
+                    <button type="button" class="ai-error-btn server-fallback" onclick="window.CvApp.fallbackToServerAI()">🖥️ Usar IA del Servidor</button>
+                    <button type="button" class="ai-error-btn" onclick="window.CvApp.openTutorialModal()">📖 Ver Tutorial</button>
+                </div>
+            `;
+        } else {
+            errDiv.innerHTML = `
+                <div class="ai-error-interactive-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>El servidor no pudo procesar tu solicitud</span>
+                </div>
+                <div>${errorText}</div>
+                <div class="ai-error-interactive-actions">
+                    <button type="button" class="ai-error-btn primary" onclick="window.CvApp.openApiKeyModal()">🔑 Configurar mi propia API Key gratis</button>
+                    <button type="button" class="ai-error-btn" onclick="window.CvApp.openTutorialModal()">📖 Ver Tutorial</button>
+                </div>
+            `;
+        }
+
+        chatMessages.appendChild(errDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function fallbackToServerAI() {
+        localStorage.removeItem('cv_custom_ai_config');
+        if (apiKeyInput) apiKeyInput.value = '';
+        if (apiKeyProviderSelect) apiKeyProviderSelect.value = 'server';
+        onProviderChanged();
+        updateApiKeyUI();
+        addSystemNotification('🖥️ <strong>Modo activado:</strong> Ahora estás usando la <strong>IA del servidor de la página</strong>.');
+        if (window.CvApp && typeof window.CvApp.showToast === 'function') {
+            window.CvApp.showToast('Cambiado a la IA del servidor', 'info');
+        }
+    }
+
+    // Exponer funciones globales en CvApp para acciones en botones interactivos
+    window.CvApp = window.CvApp || {};
+    window.CvApp.openApiKeyModal = openApiKeyModal;
+    window.CvApp.openTutorialModal = openTutorialModal;
+    window.CvApp.fallbackToServerAI = fallbackToServerAI;
 
     function renderProviderModels(provider, selectedModel = null) {
         if (!apiKeyModelSelect) return;
@@ -505,6 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('cv_custom_ai_config');
                 updateApiKeyUI();
                 closeApiKeyModal();
+                addSystemNotification('🖥️ <strong>Modo activado:</strong> Ahora estás usando la <strong>IA del servidor de la página</strong>.');
                 if (window.CvApp && typeof window.CvApp.showToast === 'function') {
                     window.CvApp.showToast('Configuración guardada: usando claves del servidor', 'info');
                 }
@@ -516,8 +600,11 @@ document.addEventListener('DOMContentLoaded', () => {
             updateApiKeyUI();
             closeApiKeyModal();
 
+            const pName = PROVIDER_CONFIGS[provider]?.name || provider;
+            addSystemNotification(`🟢 <strong>Modo activado:</strong> Ahora estás usando tu propia API Key de <strong>${pName}</strong>.`);
+
             if (window.CvApp && typeof window.CvApp.showToast === 'function') {
-                window.CvApp.showToast(`¡Configuración de ${PROVIDER_CONFIGS[provider]?.name || provider} guardada y activa!`, 'success');
+                window.CvApp.showToast(`¡Configuración de ${pName} guardada y activa!`, 'success');
             }
         });
     }
@@ -525,19 +612,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Limpiar / Quitar Clave
     if (apiKeyClearBtn) {
         apiKeyClearBtn.addEventListener('click', () => {
-            localStorage.removeItem('cv_custom_ai_config');
-            if (apiKeyInput) apiKeyInput.value = '';
-            if (apiKeyProviderSelect) apiKeyProviderSelect.value = 'server';
-            onProviderChanged();
-            updateApiKeyUI();
+            fallbackToServerAI();
             closeApiKeyModal();
-            if (window.CvApp && typeof window.CvApp.showToast === 'function') {
-                window.CvApp.showToast('Clave eliminada. Ahora se usarán las claves automáticas del servidor.', 'info');
-            }
         });
     }
 
-    // Inicializar estado del dot
+    // Inicializar estado del dot y badge
     updateApiKeyUI();
 
     // ===================================================================
@@ -683,6 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData();
             formData.append('cvFile', file);
 
+            const usedCustomConfig = getCustomAiConfig();
+
             try {
                 const response = await fetch('/api/upload-cv', {
                     method: 'POST',
@@ -692,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (result.error) {
                     if (chatMessages.contains(typingIndicator)) chatMessages.removeChild(typingIndicator);
-                    addMessage('Error: ' + result.error, 'ai');
+                    showInteractiveAiError(result.error, usedCustomConfig);
                     return;
                 }
 
@@ -711,7 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         mode: 'cv-generator',
                         history: chatHistory.slice(-4),
                         currentCv: window.CvApp?.state?.cvData || null,
-                        customConfig: getCustomAiConfig()
+                        customConfig: usedCustomConfig
                     })
                 });
 
@@ -719,7 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (chatMessages.contains(typingIndicator)) chatMessages.removeChild(typingIndicator);
 
                 if (data.error) {
-                    addMessage('Error de la IA: ' + data.error, 'ai');
+                    showInteractiveAiError(data.error, usedCustomConfig);
                     return;
                 }
 
@@ -730,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 if (chatMessages.contains(typingIndicator)) chatMessages.removeChild(typingIndicator);
-                addMessage('Error al procesar el archivo: ' + error.message, 'ai');
+                showInteractiveAiError('Error al procesar el archivo: ' + error.message, usedCustomConfig);
             }
 
             fileInput.value = '';
@@ -746,6 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.value = '';
 
         const typingIndicator = createTypingIndicator('Escribiendo...');
+        const usedCustomConfig = getCustomAiConfig();
 
         try {
             const response = await fetch('/api/chat', {
@@ -756,7 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mode: 'cv-generator',
                     history: chatHistory.slice(-4),
                     currentCv: window.CvApp?.state?.cvData || null,
-                    customConfig: getCustomAiConfig()
+                    customConfig: usedCustomConfig
                 })
             });
 
@@ -764,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatMessages.contains(typingIndicator)) chatMessages.removeChild(typingIndicator);
 
             if (data.error) {
-                addMessage('Error: ' + data.error, 'ai');
+                showInteractiveAiError(data.error, usedCustomConfig);
                 return;
             }
 
@@ -773,7 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             if (chatMessages.contains(typingIndicator)) chatMessages.removeChild(typingIndicator);
-            addMessage('Error de conexión con el servidor. Verifica que esté corriendo.', 'ai');
+            showInteractiveAiError('Error de conexión con el servidor. Verifica que esté corriendo.', usedCustomConfig);
         }
     }
 

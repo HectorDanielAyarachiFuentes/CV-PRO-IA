@@ -291,3 +291,124 @@
         display: none !important;
     }
 }
+
+/* --- Badge de Modo de IA en la cabecera del chat --- */
+.ai-provider-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    margin-left: 6px;
+}
+
+.ai-provider-badge:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05);
+}
+
+.ai-provider-badge.custom-active {
+    background: #10b981;
+    border-color: #34d399;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* --- Notificaciones del sistema en el flujo del chat --- */
+.ai-system-msg {
+    text-align: center;
+    margin: 8px 0;
+    font-size: 0.75rem;
+    color: var(--color-muted-text, #6c757d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 9999px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+[data-editor-theme="dark"] .ai-system-msg {
+    background: rgba(255, 255, 255, 0.06);
+    color: #9ca3af;
+}
+
+/* --- Caja de Error Interactiva con Acciones --- */
+.ai-error-interactive {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #991b1b;
+    font-size: 0.83rem;
+    line-height: 1.4;
+    margin: 6px 0;
+}
+
+[data-editor-theme="dark"] .ai-error-interactive {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.ai-error-interactive-title {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.ai-error-interactive-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.ai-error-btn {
+    background: #ffffff;
+    border: 1px solid #f87171;
+    color: #b91c1c;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ai-error-btn:hover {
+    background: #fee2e2;
+}
+
+.ai-error-btn.primary {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+.ai-error-btn.primary:hover {
+    background: #dc2626;
+}
+
+.ai-error-btn.server-fallback {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+}
+
+.ai-error-btn.server-fallback:hover {
+    background: #059669;
+}
+
