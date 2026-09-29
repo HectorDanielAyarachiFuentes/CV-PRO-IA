@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <title>CV Pro IA - Showcase Oficial</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #080C16;
+      color: #F8FAFC;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 20%, #151F38 0%, #080C16 70%);
+    }
+
+    /* Ambient Glows */
+    .ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .glow-blue {
+      top: -100px;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: rgba(37, 99, 235, 0.25);
+    }
+    .glow-purple {
+      bottom: -150px;
+      right: 15%;
+      width: 700px;
+      height: 700px;
+      background: rgba(124, 58, 237, 0.22);
+    }
+    .glow-green {
+      top: 30%;
+      right: 25%;
+      width: 400px;
+      height: 400px;
+      background: rgba(16, 185, 129, 0.15);
+    }
+
+    /* Grid overlay */
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* Header Brand Bar */
+    .brand-header {
+      position: absolute;
+      top: 40px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: #ffffff;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+    }
+    .brand-title span {
+      background: linear-gradient(90deg, #60A5FA, #C084FC);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-tag {
+      padding: 8px 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #93C5FD;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Common Scene Container */
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 100px;
+      z-index: 10;
+    }
+
+    /* Pill Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #60A5FA;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 24px;
+    }
+    .badge.green {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34D399;
+    }
+    .badge.purple {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.4);
+      color: #C084FC;
+    }
+
+    /* Headings */
+    .scene-title {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      letter-spacing: -0.03em;
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      max-width: 1400px;
+    }
+    .scene-title .highlight {
+      background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .scene-title .danger {
+      background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .scene-title .success {
+      background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .scene-desc {
+      font-size: 24px;
+      line-height: 1.5;
+      text-align: center;
+      color: #94A3B8;
+      max-width: 900px;
+      margin-bottom: 44px;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    /* --- SCENE 1 STYLES (Hook) --- */
+    .stat-counter-box {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-big {
+      font-size: 140px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(180deg, #F87171 0%, #DC2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 32px;
+      font-weight: 700;
+      color: #E2E8F0;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    /* --- SCENE 2 STYLES (IA & ATS) --- */
+    .compare-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      width: 1400px;
+    }
+    .compare-card {
+      padding: 36px 40px;
+      position: relative;
+    }
+    .compare-card.bad {
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.05);
+    }
+    .compare-card.good {
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
+    }
+    .card-tag {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .card-tag.bad { color: #F87171; }
+    .card-tag.good { color: #34D399; }
+    .bullet-text {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #CBD5E1;
+    }
+    .bullet-text.good {
+      font-weight: 500;
+      color: #F1F5F9;
+    }
+    .ats-meter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .meter-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: #94A3B8;
+    }
+    .meter-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #34D399;
+    }
+
+    /* --- SCENE 3 STYLES (Typst) --- */
+    .typst-container {
+      display: flex;
+      gap: 50px;
+      align-items: center;
+      width: 1440px;
+    }
+    .code-editor {
+      flex: 1;
+      height: 480px;
+      background: #0D1322;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    }
+    .editor-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    .editor-filename {
+      margin-left: 12px;
+      font-size: 13px;
+      color: #64748B;
+    }
+    .code-lines {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #94A3B8;
+    }
+    .code-kw { color: #C084FC; font-weight: 600; }
+    .code-str { color: #67E8F9; }
+    .code-fn { color: #60A5FA; }
+
+    .cv-paper-preview {
+      flex: 1;
+      height: 520px;
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 36px 40px;
+      color: #1E293B;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+      transform: perspective(1000px) rotateY(-4deg);
+    }
+    .paper-header {
+      border-bottom: 2px solid #3B82F6;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .paper-name { font-size: 26px; font-weight: 800; color: #0F172A; }
+    .paper-role { font-size: 16px; font-weight: 600; color: #2563EB; }
+    .paper-line {
+      height: 10px;
+      background: #E2E8F0;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    /* --- SCENE 4 STYLES (Voice) --- */
+    .voice-hub {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 1000px;
+      padding: 50px 60px;
+    }
+    .mic-button-glow {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 50px rgba(99, 102, 241, 0.6);
+      margin-bottom: 32px;
+    }
+    .mic-button-glow svg {
+      width: 54px;
+      height: 54px;
+      fill: #FFFFFF;
+    }
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 48px;
+      margin-bottom: 32px;
+    }
+    .wave-bar {
+      width: 6px;
+      height: 24px;
+      background: linear-gradient(180deg, #60A5FA, #C084FC);
+      border-radius: 999px;
+    }
+    .voice-transcript {
+      font-size: 28px;
+      font-weight: 600;
+      color: #E2E8F0;
+      text-align: center;
+      font-style: italic;
+    }
+    .voice-auto-fill {
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #34D399;
+    }
+
+    /* --- SCENE 5 STYLES (Importer) --- */
+    .import-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 60px;
+      width: 1300px;
+    }
+    .doc-card {
+      width: 320px;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .doc-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    .doc-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+    .arrow-flow {
+      font-size: 48px;
+      color: #60A5FA;
+    }
+    .parsed-card {
+      width: 440px;
+      height: 420px;
+      padding: 32px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .parsed-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34D399;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    /* --- SCENE 6 STYLES (Templates) --- */
+    .templates-deck {
+      display: flex;
+      gap: 32px;
+      width: 1500px;
+      justify-content: center;
+    }
+    .template-item {
+      width: 260px;
+      height: 380px;
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s;
+    }
+    .template-item.t1 { border-top: 8px solid #2563EB; }
+    .template-item.t2 { border-top: 8px solid #059669; }
+    .template-item.t3 { border-top: 8px solid #7C3AED; }
+    .template-item.t4 { border-top: 8px solid #D97706; }
+    .template-label {
+      margin-top: auto;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0F172A;
+      text-align: center;
+      padding-top: 12px;
+      border-top: 1px solid #E2E8F0;
+    }
+
+    /* --- SCENE 7 STYLES (Finale) --- */
+    .export-formats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+    .format-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+    .format-pill.highlight {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(124, 58, 237, 0.25));
+      border-color: #60A5FA;
+      color: #93C5FD;
+    }
+    .cta-button {
+      padding: 22px 64px;
+      background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+      border-radius: 999px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.5);
+      border: none;
+    }
+
+    /* Footer Timeline indicator */
+    .timeline-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 100px;
+      right: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .timeline-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-duration="120"
+    data-width="1920"
+    data-height="1080"
+  >
+    <!-- Background Decor -->
+    <div class="grid-bg"></div>
+    <div class="ambient-glow glow-blue" data-layout-allow-overflow></div>
+    <div class="ambient-glow glow-purple" data-layout-allow-overflow></div>
+    <div class="ambient-glow glow-green" data-layout-allow-overflow></div>
+
+    <!-- Header Brand Bar -->
+    <header class="brand-header">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 12h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>
+        </div>
+        <div class="brand-title">CV Pro <span>IA</span></div>
+      </div>
+      <div class="brand-tag">El Generador de CV de Élite</div>
+    </header>
+
+    <!-- Bottom Progress -->
+    <div class="timeline-indicator">
+      <div id="progress-bar" class="timeline-progress"></div>
+    </div>
+
+    <!-- AUDIO LAYER (Track, Voiceover & SFX) -->
+    <audio id="bg-music" data-start="0" data-duration="120" data-track-index="10" data-volume="1" src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3"></audio>
+    <audio id="sfx-reveal" data-start="4.8" data-duration="1.48" data-track-index="11" data-volume="0.80" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+    <audio id="sfx-scene2" data-start="12.0" data-duration="0.19" data-track-index="12" data-volume="0.75" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+    <audio id="sfx-ats-score" data-start="22.5" data-duration="0.26" data-track-index="13" data-volume="0.85" src="assets/sfx/casino/chips-collide-1.ogg"></audio>
+    <audio id="sfx-scene3" data-start="32.0" data-duration="0.11" data-track-index="14" data-volume="0.75" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio id="sfx-scene4" data-start="52.0" data-duration="0.19" data-track-index="15" data-volume="0.75" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+    <audio id="sfx-voice-ding" data-start="61.0" data-duration="0.24" data-track-index="16" data-volume="0.80" src="assets/sfx/impact/impactMetal_light_002.ogg"></audio>
+    <audio id="sfx-scene5" data-start="70.0" data-duration="0.10" data-track-index="17" data-volume="0.75" src="assets/sfx/interface/click_001.ogg"></audio>
+    <audio id="sfx-scene6" data-start="88.0" data-duration="0.60" data-track-index="18" data-volume="0.75" src="assets/sfx/casino/card-slide-1.ogg"></audio>
+    <audio id="sfx-scene7" data-start="104.0" data-duration="0.19" data-track-index="19" data-volume="0.75" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+    <audio id="sfx-finale" data-start="114.0" data-duration="0.66" data-track-index="20" data-volume="0.90" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
+
+    <!-- SPANISH VOICEOVER NARRATION -->
+    <audio id="voice-s1" data-start="0.1" data-duration="11.84" data-track-index="21" data-volume="1.0" src="assets/voice/voice-1.wav"></audio>
+    <audio id="voice-s2" data-start="13.0" data-duration="13.46" data-track-index="22" data-volume="1.0" src="assets/voice/voice-2.wav"></audio>
+    <audio id="voice-s3" data-start="33.0" data-duration="11.76" data-track-index="23" data-volume="1.0" src="assets/voice/voice-3.wav"></audio>
+    <audio id="voice-s4" data-start="53.0" data-duration="11.59" data-track-index="24" data-volume="1.0" src="assets/voice/voice-4.wav"></audio>
+    <audio id="voice-s5" data-start="71.0" data-duration="10.15" data-track-index="25" data-volume="1.0" src="assets/voice/voice-5.wav"></audio>
+    <audio id="voice-s6" data-start="89.0" data-duration="9.31" data-track-index="26" data-volume="1.0" src="assets/voice/voice-6.wav"></audio>
+    <audio id="voice-s7" data-start="105.0" data-duration="13.20" data-track-index="27" data-volume="1.0" src="assets/voice/voice-7.wav"></audio>
+
+    <!-- ==================== SCENE 1: EL GANCHO (0s - 12s) ==================== -->
+    <section id="scene-1" class="scene clip" data-start="0" data-duration="12" data-track-index="1">
+      <div class="badge">El Problema Oculto</div>
+      <div class="stat-counter-box">
+        <div id="s1-stat" class="stat-big">75%</div>
+        <div class="stat-label">de los currículums son descartados por filtros ATS antes de que un humano los lea.</div>
+      </div>
+      <h2 id="s1-title" class="scene-title">¿Tu currículum sigue pasando <span class="danger">desapercibido?</span></h2>
+      <p id="s1-desc" class="scene-desc">Formatos rotos, viñetas débiles y plantillas genéricas destruyen tus oportunidades laborales.</p>
+      <div id="s1-reveal" class="badge green" style="opacity: 0;">Presentamos CV Pro IA: Ingeniería de Carrera de Nueva Generación</div>
+    </section>
+
+    <!-- ==================== SCENE 2: ASISTENTE IA & ATS (12s - 32s) ==================== -->
+    <section id="scene-2" class="scene clip" data-start="12" data-duration="20" data-track-index="2">
+      <div class="badge purple">Inteligencia Artificial Especializada</div>
+      <h2 class="scene-title">Optimización con la Fórmula <span class="highlight">Google XYZ</span></h2>
+      <p class="scene-desc">Transforma descripciones pasivas en logros de alto impacto cuantificado que los reclutadores aman.</p>
+      <div class="compare-container">
+        <!-- Antes -->
+        <div class="glass-card compare-card bad">
+          <div class="card-tag bad">❌ Redacción Tradicional (Débil)</div>
+          <p class="bullet-text">"Trabajé en el equipo comercial, respondiendo emails de clientes y asistiendo en el cierre de ventas mensuales."</p>
+          <div class="ats-meter">
+            <span class="meter-label">Compatibilidad ATS</span>
+            <span class="meter-value" style="color: #F87171;">42%</span>
+          </div>
+        </div>
+        <!-- Con IA -->
+        <div class="glass-card compare-card good">
+          <div class="card-tag good">✨ Optimizado con CV Pro IA</div>
+          <p class="bullet-text good">"Aceleré el ciclo de ventas en un 38% implementando automatización con CRM, generando $240K USD en nuevos ingresos."</p>
+          <div class="ats-meter">
+            <span class="meter-label">Compatibilidad ATS Verificada</span>
+            <span id="s2-ats-score" class="meter-value">98%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCENE 3: MOTOR TIPOGRÁFICO TYPST (32s - 52s) ==================== -->
+    <section id="scene-3" class="scene clip" data-start="32" data-duration="20" data-track-index="3">
+      <div class="badge">Renderizado de Nueva Generación</div>
+      <h2 class="scene-title">Adiós a los márgenes rotos de Word.<br>Bienvenido a <span class="highlight">Typst WASM</span></h2>
+      <p class="scene-desc">Compilación tipográfica en tiempo real. Precisión milimétrica y jerarquía visual impecable.</p>
+      <div class="typst-container">
+        <!-- Code editor -->
+        <div class="code-editor">
+          <div class="editor-top">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            <span class="editor-filename">cv-template.typ</span>
+          </div>
+          <div class="code-lines">
+            <p><span class="code-kw">#import</span> <span class="code-str">"@preview/modern-cv:0.4.0"</span>: *</p>
+            <p><span class="code-fn">#show</span>: cv.with(</p>
+            <p>&nbsp;&nbsp;name: <span class="code-str">"Alejandro Morales"</span>,</p>
+            <p>&nbsp;&nbsp;role: <span class="code-str">"Lead Software Architect"</span>,</p>
+            <p>&nbsp;&nbsp;theme: <span class="code-kw">color.blue</span>,</p>
+            <p>&nbsp;&nbsp;ats-compliance: <span class="code-str">"strict-A4"</span>,</p>
+            <p>)</p>
+            <p><span class="code-fn">#cv-section</span>(<span class="code-str">"Experiencia Destacada"</span>)</p>
+          </div>
+        </div>
+        <!-- Typst paper preview -->
+        <div class="cv-paper-preview">
+          <div class="paper-header">
+            <div class="paper-name">Alejandro Morales</div>
+            <div class="paper-role">Lead Software Architect · San Francisco, CA</div>
+          </div>
+          <div class="paper-line" style="width: 85%;"></div>
+          <div class="paper-line" style="width: 100%;"></div>
+          <div class="paper-line" style="width: 70%;"></div>
+          <div style="margin-top: 24px; font-weight: 700; color: #1E40AF; font-size: 16px;">EXPERIENCIA PROFESIONAL</div>
+          <div class="paper-line" style="width: 90%; margin-top: 12px;"></div>
+          <div class="paper-line" style="width: 95%;"></div>
+          <div class="paper-line" style="width: 60%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCENE 4: DICTADO Y COMANDOS POR VOZ (52s - 70s) ==================== -->
+    <section id="scene-4" class="scene clip" data-start="52" data-duration="18" data-track-index="4">
+      <div class="badge purple">Interacción por Voz en Tiempo Real</div>
+      <h2 class="scene-title">Crea tu CV hablando. <span class="highlight">Literalmente.</span></h2>
+      <p class="scene-desc">Dicta tu experiencia laboral en lenguaje natural. La IA estructura fechas, cargos y métricas al instante.</p>
+      <div class="glass-card voice-hub">
+        <div class="mic-button-glow">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+        <div class="waveform">
+          <div class="wave-bar" style="height: 18px;"></div>
+          <div class="wave-bar" style="height: 38px;"></div>
+          <div class="wave-bar" style="height: 48px;"></div>
+          <div class="wave-bar" style="height: 28px;"></div>
+          <div class="wave-bar" style="height: 42px;"></div>
+          <div class="wave-bar" style="height: 16px;"></div>
+        </div>
+        <div class="voice-transcript">"Añadir cargo: Senior Frontend Lead en MercadoLibre de 2022 a presente..."</div>
+        <div class="voice-auto-fill">✓ Reconocido y Estructurado en la Sección Experiencia</div>
+      </div>
+    </section>
+
+    <!-- ==================== SCENE 5: IMPORTADOR UNIVERSAL (70s - 88s) ==================== -->
+    <section id="scene-5" class="scene clip" data-start="70" data-duration="18" data-track-index="5">
+      <div class="badge green">Importación Inteligente</div>
+      <h2 class="scene-title">¿Ya tienes un CV viejo? <span class="highlight">Arrástralo.</span></h2>
+      <p class="scene-desc">Soporte universal para PDF y Word (.docx). El parser semántico extrae y moderniza tus datos en 3 segundos.</p>
+      <div class="import-stage">
+        <!-- Archivo viejo -->
+        <div class="doc-card">
+          <div class="doc-icon">📄</div>
+          <div class="doc-name">Mi_CV_Antiguo.pdf</div>
+          <div style="font-size: 14px; color: #64748B; margin-top: 8px;">Formato desactualizado</div>
+        </div>
+        <!-- Flecha de proceso -->
+        <div class="arrow-flow">⚡ ➔</div>
+        <!-- Card parseada -->
+        <div class="parsed-card">
+          <div class="parsed-badge">✓ Extracción Semántica Completa</div>
+          <h4 style="font-size: 22px; font-weight: 700; color: #FFFFFF; margin-bottom: 8px;">Datos Extraídos con Éxito</h4>
+          <p style="font-size: 15px; color: #94A3B8; margin-bottom: 16px;">Información personal, 4 empleos anteriores, educación y 12 habilidades técnicas clasificadas.</p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span style="background: rgba(255, 255, 255, 0.08); padding: 4px 10px; border-radius: 6px; font-size: 12px;">React</span>
+            <span style="background: rgba(255, 255, 255, 0.08); padding: 4px 10px; border-radius: 6px; font-size: 12px;">Node.js</span>
+            <span style="background: rgba(255, 255, 255, 0.08); padding: 4px 10px; border-radius: 6px; font-size: 12px;">Arquitectura Cloud</span>
+            <span style="background: rgba(255, 255, 255, 0.08); padding: 4px 10px; border-radius: 6px; font-size: 12px;">Liderazgo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCENE 6: PLANTILLAS & PERSONALIZACIÓN (88s - 104s) ==================== -->
+    <section id="scene-6" class="scene clip" data-start="88" data-duration="16" data-track-index="6">
+      <div class="badge">Diseño Editorial</div>
+      <h2 class="scene-title">+20 Plantillas de Vanguardia</h2>
+      <p class="scene-desc">Desde perfiles ejecutivos hasta formatos minimalistas ATS-friendly. Cambia de estilo con un solo clic.</p>
+      <div class="templates-deck">
+        <div class="template-item t1">
+          <div style="height: 14px; width: 60%; background: #2563EB; border-radius: 4px; margin-bottom: 8px;"></div>
+          <div style="height: 8px; width: 80%; background: #E2E8F0; border-radius: 4px; margin-bottom: 16px;"></div>
+          <div style="height: 6px; width: 100%; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="height: 6px; width: 90%; background: #F1F5F9; border-radius: 4px;"></div>
+          <div class="template-label">ATS Friendly Pro</div>
+        </div>
+        <div class="template-item t2">
+          <div style="height: 14px; width: 50%; background: #059669; border-radius: 4px; margin-bottom: 8px;"></div>
+          <div style="height: 8px; width: 75%; background: #E2E8F0; border-radius: 4px; margin-bottom: 16px;"></div>
+          <div style="height: 6px; width: 100%; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="height: 6px; width: 85%; background: #F1F5F9; border-radius: 4px;"></div>
+          <div class="template-label">Modern Executive</div>
+        </div>
+        <div class="template-item t3">
+          <div style="height: 14px; width: 70%; background: #7C3AED; border-radius: 4px; margin-bottom: 8px;"></div>
+          <div style="height: 8px; width: 90%; background: #E2E8F0; border-radius: 4px; margin-bottom: 16px;"></div>
+          <div style="height: 6px; width: 100%; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="height: 6px; width: 80%; background: #F1F5F9; border-radius: 4px;"></div>
+          <div class="template-label">Tech Architect</div>
+        </div>
+        <div class="template-item t4">
+          <div style="height: 14px; width: 65%; background: #D97706; border-radius: 4px; margin-bottom: 8px;"></div>
+          <div style="height: 8px; width: 80%; background: #E2E8F0; border-radius: 4px; margin-bottom: 16px;"></div>
+          <div style="height: 6px; width: 100%; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="height: 6px; width: 70%; background: #F1F5F9; border-radius: 4px;"></div>
+          <div class="template-label">Editorial Clean</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCENE 7: EXPORTACIÓN & GRAN FINAL (104s - 120s) ==================== -->
+    <section id="scene-7" class="scene clip" data-start="104" data-duration="16" data-track-index="7">
+      <div class="badge green">Exportación en 1 Clic</div>
+      <h2 class="scene-title">Tu próximo gran trabajo comienza con el <span class="highlight">CV perfecto</span></h2>
+      <div class="export-formats">
+        <div class="format-pill highlight">📄 PDF Vectorial de Imprenta</div>
+        <div class="format-pill">📝 Word (.docx) Nativo</div>
+        <div class="format-pill">⚡ Typst Source (.typ)</div>
+        <div class="format-pill">🌐 Enlace Web Interactivo con QR</div>
+      </div>
+      <button class="cta-button">Crea tu CV con IA Ahora</button>
+      <div style="margin-top: 32px; font-size: 16px; color: #64748B; font-weight: 600;">
+        100% Código Abierto · Diseñado para Reventar tus Entrevistas
+      </div>
+    </section>
+  </div>
+
+  <!-- TIMELINE LOGIC WITH GSAP -->
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Progress bar across the 120 seconds
+    tl.to("#progress-bar", { width: "100%", duration: 120, ease: "none" }, 0);
+
+    // ================= SCENE 1 (0s - 12s) =================
+    tl.from("#s1-stat", { scale: 0.6, opacity: 0, duration: 1.2, ease: "back.out(1.7)" }, 0.5);
+    tl.from("#s1-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 1.5);
+    tl.from("#s1-desc", { y: 20, opacity: 0, duration: 1.0, ease: "power3.out" }, 2.5);
+    tl.fromTo("#s1-reveal", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 1.0, ease: "back.out(1.5)" }, 4.8);
+
+    // ================= SCENE 2 (12s - 32s) =================
+    tl.from("#scene-2 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 12.2);
+    tl.from("#scene-2 .scene-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 12.8);
+    tl.from("#scene-2 .scene-desc", { y: 20, opacity: 0, duration: 1.0, ease: "power3.out" }, 13.8);
+    tl.from("#scene-2 .compare-card.bad", { x: -60, opacity: 0, duration: 1.2, ease: "power3.out" }, 15.0);
+    tl.from("#scene-2 .compare-card.good", { x: 60, opacity: 0, duration: 1.2, ease: "power3.out" }, 16.5);
+    // Score count-up simulation
+    tl.fromTo("#s2-ats-score", { textContent: "42%" }, { textContent: "98%", duration: 2.0, ease: "power2.out", snap: { textContent: 1 } }, 22.0);
+
+    // ================= SCENE 3 (32s - 52s) =================
+    tl.from("#scene-3 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 32.2);
+    tl.from("#scene-3 .scene-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 32.8);
+    tl.from("#scene-3 .code-editor", { x: -80, opacity: 0, duration: 1.4, ease: "power3.out" }, 34.0);
+    tl.from("#scene-3 .cv-paper-preview", { x: 80, opacity: 0, duration: 1.4, ease: "power3.out" }, 35.5);
+
+    // ================= SCENE 4 (52s - 70s) =================
+    tl.from("#scene-4 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 52.2);
+    tl.from("#scene-4 .scene-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 52.8);
+    tl.from("#scene-4 .mic-button-glow", { scale: 0, duration: 1.2, ease: "back.out(2)" }, 53.8);
+    tl.from("#scene-4 .waveform .wave-bar", { scaleY: 0.2, stagger: 0.1, duration: 0.6, repeat: 5, yoyo: true, ease: "sine.inOut" }, 54.5);
+    tl.from("#scene-4 .voice-transcript", { opacity: 0, y: 15, duration: 1.0, ease: "power2.out" }, 56.5);
+    tl.from("#scene-4 .voice-auto-fill", { scale: 0.8, opacity: 0, duration: 0.8, ease: "back.out(1.5)" }, 61.0);
+
+    // ================= SCENE 5 (70s - 88s) =================
+    tl.from("#scene-5 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 70.2);
+    tl.from("#scene-5 .scene-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 70.8);
+    tl.from("#scene-5 .doc-card", { x: -60, opacity: 0, duration: 1.2, ease: "power3.out" }, 72.0);
+    tl.from("#scene-5 .arrow-flow", { scale: 0, opacity: 0, duration: 0.8, ease: "back.out(2)" }, 73.5);
+    tl.from("#scene-5 .parsed-card", { x: 60, opacity: 0, duration: 1.2, ease: "power3.out" }, 74.5);
+
+    // ================= SCENE 6 (88s - 104s) =================
+    tl.from("#scene-6 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 88.2);
+    tl.from("#scene-6 .scene-title", { y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 88.8);
+    tl.from("#scene-6 .template-item", {
+      y: 60,
+      opacity: 0,
+      stagger: 0.3,
+      duration: 1.2,
+      ease: "power3.out"
+    }, 90.0);
+
+    // ================= SCENE 7 (104s - 120s) =================
+    tl.from("#scene-7 .badge", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out" }, 104.2);
+    tl.from("#scene-7 .scene-title", { scale: 0.9, opacity: 0, duration: 1.2, ease: "power3.out" }, 104.8);
+    tl.from("#scene-7 .format-pill", { y: 20, opacity: 0, stagger: 0.2, duration: 0.8, ease: "power2.out" }, 106.5);
+    tl.from("#scene-7 .cta-button", { scale: 0.8, opacity: 0, duration: 1.0, ease: "back.out(2)" }, 109.0);
+    tl.to("#scene-7 .cta-button", { scale: 1.05, repeat: 6, yoyo: true, duration: 1.2, ease: "sine.inOut" }, 110.5);
+
+    // Set and fade out audio bed at the very end (ducked for voiceover clarity)
+    tl.set("#bg-music", { volume: 0.20 }, 0);
+    tl.to("#bg-music", { volume: 0, duration: 3.0, ease: "power1.out" }, 117.0);
+
+    // Expose timeline to Hyperframes engine
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = tl;
+    tl.seek(0);
+  </script>
+</body>
+</html>

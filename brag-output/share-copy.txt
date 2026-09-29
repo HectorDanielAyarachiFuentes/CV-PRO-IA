@@ -1,0 +1,1 @@
+El 75% de los currículums son descartados por filtros ATS antes de que un reclutador los lea. Construí CV Pro IA: un generador de CV de nueva generación con optimización de logros mediante IA, compilador tipográfico Typst WASM en tiempo real, comandos por voz y exportación en 1 clic. Código abierto y listo para usar: https://github.com/HectorDanielAyarachiFuentes/CV-PRO-IA
