@@ -12,7 +12,8 @@ const { buildNativeDocx } = require('./docxBuilder');
 require('dotenv').config(); // Carga las claves desde el archivo .env
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+const REMOTE_API_FALLBACK = process.env.REMOTE_API_FALLBACK || 'https://cv-pro-ia.onrender.com';
 
 // Middleware para entender JSON y servir archivos estáticos
 app.use(express.json({ limit: '10mb' }));
@@ -398,7 +399,26 @@ Si aún estás recolectando información y no es momento de actualizar el docume
             .filter(Boolean);
 
         if (groqApiKeys.length === 0) {
-            return res.status(500).json({ error: 'No hay claves de API (GROQ_API_KEY) configuradas en el servidor. Puedes configurar tu propia API Key con el botón superior "API Key IA".' });
+            console.log(`[API Chat] No hay claves en .env local. Usando servidor de respaldo (${REMOTE_API_FALLBACK})...`);
+            try {
+                const remoteRes = await fetch(`${REMOTE_API_FALLBACK}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(req.body)
+                });
+                if (remoteRes.ok) {
+                    const remoteData = await remoteRes.json();
+                    console.log(`[API Chat] Éxito a través del servidor remoto de respaldo.`);
+                    return res.json(remoteData);
+                } else {
+                    const errorRemote = await remoteRes.json().catch(() => ({}));
+                    console.warn(`[API Chat] Servidor remoto devolvió HTTP ${remoteRes.status}:`, errorRemote);
+                }
+            } catch (err) {
+                console.warn(`[API Chat] No se pudo conectar al servidor de respaldo: ${err.message}`);
+            }
+
+            return res.status(500).json({ error: 'No hay claves de API (GROQ_API_KEY) configuradas en el servidor local y el servidor de respaldo no respondió. Puedes configurar tu propia API Key con el botón superior "API Key IA".' });
         }
 
         // Lista de modelos de contingencia ordenados: Qwen 3.8/3.6, GPT OSS y Llama
@@ -492,6 +512,29 @@ app.post('/api/upload-cv', upload.single('cvFile'), async (req, res) => {
                 .filter(key => key.startsWith('GROQ_API_KEY'))
                 .map(key => process.env[key])
                 .filter(Boolean);
+
+            if (groqApiKeys.length === 0) {
+                console.log(`[Upload Vision] Sin claves locales. Reenviando imagen al servidor de respaldo (${REMOTE_API_FALLBACK})...`);
+                try {
+                    const FormData = require('form-data');
+                    const form = new FormData();
+                    form.append('cvFile', fileBuffer, {
+                        filename: req.file.originalname,
+                        contentType: mimeType
+                    });
+                    const remoteRes = await fetch(`${REMOTE_API_FALLBACK}/api/upload-cv`, {
+                        method: 'POST',
+                        body: form,
+                        headers: form.getHeaders()
+                    });
+                    if (remoteRes.ok) {
+                        const remoteData = await remoteRes.json();
+                        return res.json(remoteData);
+                    }
+                } catch (remoteErr) {
+                    console.warn(`[Upload Vision] Falló fallback remoto: ${remoteErr.message}`);
+                }
+            }
 
             const modelosVision = ["qwen/qwen3.8-27b", "qwen/qwen3.6-27b"];
             let visionText = null;
