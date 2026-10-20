@@ -14,7 +14,9 @@
         const originalTitle = document.title;
         const firstName = cvData.personalInfo?.firstName || 'CV';
         const lastName = cvData.personalInfo?.lastName || 'Profesional';
-        const newTitle = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}`;
+        const isLetter = CvApp.activeDocMode === 'letter';
+        const docPrefix = isLetter ? 'Carta' : 'CV';
+        const newTitle = `${docPrefix}_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}`;
         
         document.title = newTitle;
         window.print();
@@ -158,12 +160,14 @@ ${cvHtml}
             a.href = url;
             const firstName = cvData.personalInfo?.firstName || 'CV';
             const lastName = cvData.personalInfo?.lastName || 'Profesional';
-            a.download = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}.html`;
+            const isLetter = CvApp.activeDocMode === 'letter';
+            const docPrefix = isLetter ? 'Carta' : 'CV';
+            a.download = `${docPrefix}_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            CvApp.showToast("¡Archivo HTML exportado con éxito!", "success");
+            CvApp.showToast(`¡Archivo HTML de ${isLetter ? 'la Carta' : 'el CV'} exportado con éxito!`, "success");
         } catch (error) {
             console.error("Error al generar el archivo HTML:", error);
             CvApp.showToast("Hubo un error al intentar generar el archivo HTML.", "error");
@@ -176,6 +180,93 @@ ${cvHtml}
     const downloadTypst = async () => {
         if (typeof CvApp.syncFromInlinePreview === 'function') {
             CvApp.syncFromInlinePreview();
+        }
+
+        if (CvApp.activeDocMode === 'letter') {
+            const cvData = CvApp.state?.cvData || {};
+            const p = cvData.personalInfo || {};
+            const letter = cvData.coverLetter || {};
+            const senderName = (p.firstName ? `${p.firstName} ${p.lastName || ''}`.trim() : 'Candidato Profesional');
+            const dateStr = letter.date || new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            const paragraphs = Array.isArray(letter.paragraphs) && letter.paragraphs.length > 0
+                ? letter.paragraphs
+                : ['Le escribo con gran entusiasmo para presentar mi candidatura...'];
+            
+            const typstContent = `// Carta de Presentación generada por CV Pro IA
+#set page(
+  paper: "a4",
+  margin: (x: 2.5cm, top: 2.8cm, bottom: 2.5cm),
+)
+#set text(
+  font: "Liberation Sans",
+  size: 11pt,
+  fill: rgb("#1e293b"),
+  lang: "es",
+)
+
+// Encabezado
+#place(top + left, dy: -1.2cm)[
+  #text(size: 22pt, weight: "bold", fill: rgb("${cvData.themeColor || '#0d6efd'}"))[${senderName}]
+  #v(2pt)
+  #text(size: 11pt, fill: rgb("#64748b"))[${p.title || 'Profesional'}]
+]
+
+#place(top + right, dy: -1.2cm)[
+  #align(right)[
+    #text(size: 9.5pt, fill: rgb("#64748b"))[
+      ${p.email ? `${p.email} \\` : ''}
+      ${p.phone ? `${p.phone} \\` : ''}
+      ${p.address ? `${p.address} \\` : ''}
+      ${p.website ? `${p.website}` : ''}
+    ]
+  ]
+]
+
+#v(2.5cm)
+#line(length: 100%, stroke: 1.5pt + rgb("${cvData.themeColor || '#0d6efd'}"))
+#v(0.8cm)
+
+// Destinatario y Fecha
+#grid(
+  columns: (1fr, 1fr),
+  [
+    #text(size: 8.5pt, weight: "bold", fill: rgb("${cvData.themeColor || '#0d6efd'}"))[PARA:] \\
+    #text(weight: "bold")[${letter.recipientName || 'Equipo de Selección'}] \\
+    #text(fill: rgb("#64748b"))[${letter.recipientTitle || 'Gerente de Recursos Humanos'}] \\
+    #text(weight: "medium")[${letter.companyName || 'Empresa Destino'}] \\
+    #text(fill: rgb("#64748b"))[${letter.companyAddress || ''}]
+  ],
+  align(right)[
+    #text(size: 8.5pt, weight: "bold", fill: rgb("${cvData.themeColor || '#0d6efd'}"))[FECHA:] \\
+    ${dateStr}
+  ]
+)
+
+#v(1.2cm)
+#text(weight: "bold", size: 11.5pt)[${letter.salutation || 'Estimado/a Equipo de Selección,'}]
+
+#v(0.4cm)
+${paragraphs.map(par => `${par}\n#v(0.35cm)`).join('\n')}
+
+#v(1cm)
+${letter.signoff || 'Atentamente,'} \\
+#v(1.5cm)
+#text(weight: "bold", size: 12pt)[${letter.signature || senderName}] \\
+#text(size: 10pt, fill: rgb("#64748b"))[${p.title || ''}]
+`;
+            const blob = new Blob([typstContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const firstName = p.firstName || 'Candidato';
+            const lastName = p.lastName || '';
+            a.download = `Carta_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}.typ`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            CvApp.showToast("¡Archivo Typst (.typ) de la Carta exportado con éxito!", "success");
+            return;
         }
         if (typeof TypstCompiler !== 'undefined') {
             try {
@@ -603,7 +694,115 @@ ${cvHtml}
     };
 
     /**
-     * Exporta el CV a un documento Word (.docx) nativo con formato OpenXML idéntico a la previsualización.
+     * Construye un documento Word (.doc) con formato elegante para la Carta de Presentación.
+     */
+    const buildCoverLetterWordHtml = (cvData) => {
+        const p = cvData.personalInfo || {};
+        const letter = cvData.coverLetter || {};
+        const senderName = (p.firstName ? `${p.firstName} ${p.lastName || ''}`.trim() : 'Candidato Profesional');
+        const themeColor = cvData.themeColor || '#0d6efd';
+        const textColorDark = cvData.textColorDark || '#1e293b';
+        const textColorMuted = cvData.textColorMuted || '#64748b';
+        const dateStr = letter.date || new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        const paragraphs = Array.isArray(letter.paragraphs) && letter.paragraphs.length > 0
+            ? letter.paragraphs
+            : ['Le escribo con gran entusiasmo para presentar mi candidatura...'];
+
+        return `<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset="utf-8">
+    <title>Carta de Presentación - ${senderName}</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+        @page Section1 {
+            size: 595.3pt 841.9pt; /* A4 */
+            margin: 56.7pt 56.7pt 56.7pt 56.7pt; /* 2cm */
+            mso-header-margin: 35.4pt;
+            mso-footer-margin: 35.4pt;
+            mso-paper-source: 0;
+        }
+        div.Section1 { page: Section1; }
+        body {
+            font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+            font-size: 11pt;
+            color: ${textColorDark};
+            line-height: 1.65;
+        }
+        h1 {
+            font-size: 20pt;
+            font-weight: bold;
+            color: ${themeColor};
+            margin: 0 0 4pt 0;
+        }
+        p {
+            margin: 0 0 12pt 0;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <div class="Section1">
+        <!-- Encabezado / Membrete -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom: 2pt solid ${themeColor}; padding-bottom: 12pt; margin-bottom: 20pt;">
+            <tr>
+                <td align="left" valign="top">
+                    <h1>${senderName}</h1>
+                    <div style="font-size: 12pt; color: ${textColorMuted}; font-weight: 500;">${p.title || 'Profesional'}</div>
+                </td>
+                <td align="right" valign="top" style="font-size: 9.5pt; color: ${textColorMuted}; line-height: 1.4;">
+                    ${p.email ? `<div>${p.email}</div>` : ''}
+                    ${p.phone ? `<div>${p.phone}</div>` : ''}
+                    ${p.address ? `<div>${p.address}</div>` : ''}
+                    ${p.website ? `<div>${p.website}</div>` : ''}
+                </td>
+            </tr>
+        </table>
+
+        <!-- Fecha y Destinatario -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20pt;">
+            <tr>
+                <td align="left" valign="top" style="font-size: 10.5pt; line-height: 1.5;">
+                    <div style="font-size: 8.5pt; text-transform: uppercase; letter-spacing: 1pt; color: ${themeColor}; font-weight: bold; margin-bottom: 3pt;">Para:</div>
+                    <div style="font-weight: bold; color: ${textColorDark};">${letter.recipientName || 'Equipo de Selección'}</div>
+                    <div style="color: ${textColorMuted};">${letter.recipientTitle || 'Gerente de Recursos Humanos'}</div>
+                    <div style="font-weight: 600;">${letter.companyName || 'Empresa Destino'}</div>
+                    <div style="color: ${textColorMuted}; font-size: 9.5pt;">${letter.companyAddress || ''}</div>
+                </td>
+                <td align="right" valign="top" style="font-size: 10.5pt;">
+                    <div style="font-size: 8.5pt; text-transform: uppercase; letter-spacing: 1pt; color: ${themeColor}; font-weight: bold; margin-bottom: 3pt;">Fecha:</div>
+                    <div style="font-weight: 500;">${dateStr}</div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Saludo -->
+        <p style="font-weight: bold; font-size: 11.5pt; margin-bottom: 14pt;">${letter.salutation || 'Estimado/a Equipo de Selección,'}</p>
+
+        <!-- Párrafos del cuerpo -->
+        ${paragraphs.map(text => `<p>${text}</p>`).join('\n')}
+
+        <!-- Despedida y Firma -->
+        <div style="margin-top: 25pt; padding-top: 15pt;">
+            <p style="margin-bottom: 25pt; color: ${textColorMuted};">${letter.signoff || 'Atentamente,'}</p>
+            <div style="font-size: 12pt; font-weight: bold; color: ${textColorDark};">${letter.signature || senderName}</div>
+            <div style="font-size: 10pt; color: ${textColorMuted};">${p.title || ''}</div>
+        </div>
+    </div>
+</body>
+</html>`;
+    };
+
+    /**
+     * Exporta el CV o la Carta a un documento Word (.docx / .doc).
      */
     const downloadWord = async () => {
         if (typeof CvApp.syncFromInlinePreview === 'function') {
@@ -612,6 +811,28 @@ ${cvHtml}
         const cvData = CvApp.state?.cvData || {};
         const firstName = cvData.personalInfo?.firstName || 'CV';
         const lastName = cvData.personalInfo?.lastName || 'Profesional';
+        const isLetter = CvApp.activeDocMode === 'letter';
+
+        if (isLetter) {
+            try {
+                const wordHtml = buildCoverLetterWordHtml(cvData);
+                const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Carta_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}.doc`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                CvApp.showToast("¡Carta de presentación exportada a Word con éxito!", "success");
+            } catch (err) {
+                console.error("Error al exportar carta a Word:", err);
+                CvApp.showToast("Hubo un error al generar el archivo Word de la carta.", "error");
+            }
+            return;
+        }
+
         const fileName = `CV_${firstName.replace(/ /g, '_')}_${lastName.replace(/ /g, '_')}.docx`;
 
         CvApp.showToast("Generando documento Word (.docx) profesional...", "info");

@@ -77,6 +77,19 @@ function cleanCvForPrompt(cv) {
             label: f.label || '',
             value: f.value || ''
         })) : [],
+        coverLetter: cv.coverLetter ? {
+            template: cv.coverLetter.template || 'modern',
+            companyName: cv.coverLetter.companyName || '',
+            jobTitle: cv.coverLetter.jobTitle || '',
+            recipientName: cv.coverLetter.recipientName || '',
+            recipientTitle: cv.coverLetter.recipientTitle || '',
+            companyAddress: cv.coverLetter.companyAddress || '',
+            date: cv.coverLetter.date || '',
+            salutation: cv.coverLetter.salutation || '',
+            paragraphs: Array.isArray(cv.coverLetter.paragraphs) ? cv.coverLetter.paragraphs : [],
+            signoff: cv.coverLetter.signoff || '',
+            signature: cv.coverLetter.signature || ''
+        } : null,
         design: {
             themeColor: cv.themeColor || '',
             textColorDark: cv.textColorDark || '',
@@ -357,9 +370,30 @@ IMPORTANTE: Cuando el usuario te pida explícitamente generar el CV, actualizar 
     "impacts": [ { "id": "imp-1", "description": "" } ],
     "portfolio": [ { "id": "port-1", "title": "", "img": "" } ],
     "footer": [ { "id": "foot-1", "type": "text", "label": "", "value": "" } ],
+    "coverLetter": {
+      "template": "modern",
+      "companyName": "Nombre de la empresa",
+      "jobTitle": "Puesto al que aspira",
+      "recipientName": "Nombre de la persona o 'Equipo de Selección'",
+      "recipientTitle": "Cargo del destinatario (opcional)",
+      "companyAddress": "Ciudad, País",
+      "date": "Fecha (opcional)",
+      "salutation": "Estimado/a Equipo de Selección,",
+      "paragraphs": [
+        "Párrafo 1 introductorio conectando con la vacante...",
+        "Párrafo 2 destacando logros cuantificables y experiencia clave...",
+        "Párrafo 3 sobre valor diferencial y encaje cultural...",
+        "Párrafo 4 de llamada a la acción y agradecimiento..."
+      ],
+      "signoff": "Atentamente,",
+      "signature": "Nombre del candidato"
+    },
     "design": { "themeColor": "", "textColorDark": "", "textColorMuted": "", "sectionTitleColor": "" }
   }
 }
+IMPORTANTE SOBRE CARTA DE PRESENTACIÓN (coverLetter):
+- Si el usuario te pide redactar, modificar, adaptar o pulir su carta de presentación (cover letter), incluye el campo "coverLetter" en "data" con párrafos persuasivos, profesionales y alineados con su experiencia real del CV.
+- Puedes sugerir o usar las plantillas: "modern" (por defecto), "executive" (elegante / serif), "sidebar" o "minimalist".
 IMPORTANTE SOBRE INICIALES / AVATAR:
 - Si el avatar es de tipo "initials" o si estás cambiando o generando el nombre de la persona (firstName / lastName), debes actualizar SIEMPRE "avatar": { "type": "initials", "value": "..." } con las iniciales en mayúsculas del nuevo nombre (por ejemplo: Homer Simpson -> "HS", Homero Simpson -> "HS", Bruce Wayne -> "BW"). ¡Nunca dejes las iniciales anteriores si cambias el nombre!
 Asegúrate de conservar en el JSON final cualquier dato que ya existiera en el 'ESTADO ACTUAL DEL CV' si el usuario no pidió borrarlo. Sin embargo, si estás extrayendo datos de un documento nuevo proporcionado por el usuario, DEBES enviar arreglos vacíos [] para impacts, portfolio, footer y cualquier otra lista si la información no está presente en el documento, para que se borren los datos de ejemplo.

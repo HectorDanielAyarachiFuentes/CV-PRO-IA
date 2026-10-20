@@ -502,10 +502,30 @@
             cvData.personalInfo.summary = summaryEl.innerText.trim();
         }
 
-        // 5. Guardar el HTML completo personalizado en el estado
+        // 5. Extracción de campos de la Carta de Presentación si están en el DOM
+        if (cvPreviewWrapper.querySelector('[data-cover-field]')) {
+            const letter = cvData.coverLetter = cvData.coverLetter || {};
+            cvPreviewWrapper.querySelectorAll('[data-cover-field]').forEach(el => {
+                const field = el.dataset.coverField;
+                if (!field) return;
+                if (field.startsWith('paragraph-')) {
+                    const idx = parseInt(field.replace('paragraph-', ''), 10);
+                    if (!isNaN(idx)) {
+                        letter.paragraphs = letter.paragraphs || [];
+                        letter.paragraphs[idx] = el.innerText.trim();
+                    }
+                } else {
+                    letter[field] = el.innerText.trim();
+                }
+            });
+            updateFormInputsFromState();
+            return;
+        }
+
+        // 6. Guardar el HTML completo personalizado en el estado
         cvData.customHtml = cvPreviewWrapper.innerHTML;
 
-        // 6. Reflejar cambios en los inputs del formulario en el panel izquierdo
+        // 7. Reflejar cambios en los inputs del formulario en el panel izquierdo
         updateFormInputsFromState();
     };
 
@@ -520,7 +540,27 @@
         if (!formWrapper) return;
 
         const activeSection = formWrapper.querySelector('.form-section.active')?.dataset.section;
-        if (activeSection === 'personal' && cvData.personalInfo) {
+        if (activeSection === 'cover-letter' && cvData.coverLetter) {
+            const letter = cvData.coverLetter;
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && document.activeElement !== el && el.value !== (val || '')) el.value = val || '';
+            };
+            setVal('cl-company', letter.companyName);
+            setVal('cl-job-title', letter.jobTitle);
+            setVal('cl-recipient', letter.recipientName);
+            setVal('cl-recipient-title', letter.recipientTitle);
+            setVal('cl-address', letter.companyAddress);
+            setVal('cl-date', letter.date);
+            setVal('cl-salutation', letter.salutation);
+            setVal('cl-signoff', letter.signoff);
+            setVal('cl-signature', letter.signature);
+            if (Array.isArray(letter.paragraphs)) {
+                setVal('cl-paragraphs', letter.paragraphs.join('\n\n'));
+            }
+            const tmplSelect = document.getElementById('cover-letter-template-select');
+            if (tmplSelect && letter.template) tmplSelect.value = letter.template;
+        } else if (activeSection === 'personal' && cvData.personalInfo) {
             const fnInput = formWrapper.querySelector('input[name="firstName"]');
             const lnInput = formWrapper.querySelector('input[name="lastName"]');
             const titleInput = formWrapper.querySelector('input[name="title"]');

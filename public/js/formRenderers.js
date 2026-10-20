@@ -154,6 +154,110 @@
         return `<div class="form-section" data-section="structure"><h2 class="section-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>Organizar Secciones</h2><p class="section-subtitle">Arrastra y suelta las secciones para cambiar su orden en el CV.</p><div id="section-order-list">${cvData.sectionOrder.map(sectionKey => `<div class="draggable-item" draggable="true" data-section-key="${sectionKey}"><svg class="drag-handle" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg><span>${sectionLabels[sectionKey]}</span></div>`).join('')}</div></div>`;
     };
 
+    const renderCoverLetterFormHTML = () => {
+        const cvData = CvApp.state.cvData;
+        const letter = cvData.coverLetter || {};
+        const paragraphs = Array.isArray(letter.paragraphs) ? letter.paragraphs.join('\n\n') : (letter.paragraphs || '');
+        const currentTemplate = letter.template || 'modern';
+
+        return `<div class="form-section" data-section="cover-letter">
+            <h2 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <polyline points="3 7 12 13 21 7" />
+                </svg>
+                Carta de Presentación
+            </h2>
+            <p class="section-subtitle">Redacta una carta profesional a juego con tu CV para postularte con éxito.</p>
+
+            <!-- Banner Asistente IA para la carta -->
+            <div style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(99, 102, 241, 0.12)); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: var(--radius-md); padding: 1.1rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+                    <div>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--color-dark-text); display: flex; align-items: center; gap: 6px;">
+                            <span>✨</span> Redactar o Pulir con IA
+                        </h4>
+                        <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--color-muted-text);">Genera una carta personalizada conectando tu CV con la empresa a la que aspiras.</p>
+                    </div>
+                    <button id="ai-generate-letter-btn" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                        <span>✨ Redactar con IA</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Plantilla de Carta -->
+            <div class="form-group">
+                <label for="cover-letter-template-select">Modelo Visual de Carta</label>
+                <select id="cover-letter-template-select" name="template">
+                    <option value="modern" ${currentTemplate === 'modern' ? 'selected' : ''}>Moderna (Acento Superior & Limpia)</option>
+                    <option value="executive" ${currentTemplate === 'executive' ? 'selected' : ''}>Ejecutiva / Harvard (Serif Clásica)</option>
+                    <option value="sidebar" ${currentTemplate === 'sidebar' ? 'selected' : ''}>Lateral / Doble Columna (A juego con Sidebar)</option>
+                    <option value="minimalist" ${currentTemplate === 'minimalist' ? 'selected' : ''}>Minimalista (Estilo Suizo)</option>
+                </select>
+            </div>
+
+            <!-- Datos del Destinatario -->
+            <div class="subsection-title" style="margin-top: 1.25rem;">Datos del Destinatario</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cl-company">Empresa a la que postulas</label>
+                    <input type="text" id="cl-company" name="companyName" value="${letter.companyName || ''}" placeholder="Ej: Google / Mercado Libre">
+                </div>
+                <div class="form-group">
+                    <label for="cl-job-title">Cargo o Puesto deseado</label>
+                    <input type="text" id="cl-job-title" name="jobTitle" value="${letter.jobTitle || ''}" placeholder="Ej: Desarrollador Backend Senior">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cl-recipient">Persona o Equipo destinatario</label>
+                    <input type="text" id="cl-recipient" name="recipientName" value="${letter.recipientName || ''}" placeholder="Ej: Equipo de Selección o Martín Gómez">
+                </div>
+                <div class="form-group">
+                    <label for="cl-recipient-title">Cargo del destinatario (opcional)</label>
+                    <input type="text" id="cl-recipient-title" name="recipientTitle" value="${letter.recipientTitle || ''}" placeholder="Ej: Gerente de Recursos Humanos">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cl-address">Ubicación de la Empresa</label>
+                    <input type="text" id="cl-address" name="companyAddress" value="${letter.companyAddress || ''}" placeholder="Ej: Buenos Aires, Argentina">
+                </div>
+                <div class="form-group">
+                    <label for="cl-date">Fecha personalizada (opcional)</label>
+                    <input type="text" id="cl-date" name="date" value="${letter.date || ''}" placeholder="Ej: 20 de Octubre de 2026 (vacío = hoy)">
+                </div>
+            </div>
+
+            <!-- Contenido de la Carta -->
+            <div class="subsection-title" style="margin-top: 1.5rem;">Cuerpo de la Carta</div>
+            <div class="form-group">
+                <label for="cl-salutation">Saludo inicial</label>
+                <input type="text" id="cl-salutation" name="salutation" value="${letter.salutation || 'Estimado/a Equipo de Selección,'}" placeholder="Ej: Estimado/a Responsable de Selección,">
+            </div>
+
+            <div class="form-group">
+                <label for="cl-paragraphs">Párrafos del Mensaje (separa cada párrafo con una línea en blanco)</label>
+                <textarea id="cl-paragraphs" name="paragraphs" rows="8" placeholder="Escribe aquí los párrafos de tu carta de presentación...">${paragraphs}</textarea>
+                <p style="font-size:0.8rem; color:var(--color-muted-text); margin-top:0.35rem;">💡 Consejo: También puedes hacer clic sobre cualquier párrafo en la vista previa para editarlo directamente.</p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cl-signoff">Despedida</label>
+                    <input type="text" id="cl-signoff" name="signoff" value="${letter.signoff || 'Atentamente,'}" placeholder="Ej: Atentamente,">
+                </div>
+                <div class="form-group">
+                    <label for="cl-signature">Firma (Tu Nombre)</label>
+                    <input type="text" id="cl-signature" name="signature" value="${letter.signature || ''}" placeholder="Ej: Tu Nombre y Apellido">
+                </div>
+            </div>
+        </div>`;
+    };
+
     // --- BUILD FORM RENDERERS ---
     const buildFormRenderers = (renderForm) => {
         const formRenderers = {};
@@ -161,6 +265,7 @@
         formRenderers.design = () => renderForm(renderDesignFormHTML());
         formRenderers.avatar = () => renderForm(renderAvatarFormHTML());
         formRenderers.personal = () => renderForm(renderPersonalFormHTML());
+        formRenderers['cover-letter'] = () => renderForm(renderCoverLetterFormHTML());
         formRenderers.skills = () => renderForm(renderSkillsFormHTML());
         formRenderers.experience = () => renderForm(renderDynamicListFormHTML('experience', { title: 'Experiencia Laboral', singularTitle: 'Experiencia', subtitle: 'Detalla tus roles previos. ¡Enfócate en logros cuantificables para demostrar tu impacto!', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="6" rx="2"/><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>', field1: 'Cargo', name1: 'position', placeholder1: 'Ej: Desarrollador Backend', field2: 'Empresa', name2: 'company', placeholder2: 'Ej: Tech Solutions Inc.' }));
         formRenderers.education = () => renderForm(renderDynamicListFormHTML('education', { title: 'Educación', singularTitle: 'Formación', subtitle: 'Incluye tus títulos, certificaciones y cursos más relevantes.', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z"/><path d="m12 22-6-3v-5l6 4 6-4v5z"/><path d="M12 11V2"/></svg>', field1: 'Título', name1: 'degree', placeholder1: 'Ej: Ingeniería en Sistemas', field2: 'Institución', name2: 'institution', placeholder2: 'Ej: Universidad de Buenos Aires' }));

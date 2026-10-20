@@ -161,6 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newCvData.footer && Array.isArray(newCvData.footer)) {
             currentData.footer = newCvData.footer;
         }
+        if (newCvData.coverLetter) {
+            currentData.coverLetter = { ...(currentData.coverLetter || {}), ...newCvData.coverLetter };
+            if (typeof window.CvApp?.setDocMode === 'function') {
+                window.CvApp.setDocMode('letter');
+            }
+        }
         if (newCvData.design) {
             if (newCvData.design.themeColor) currentData.themeColor = newCvData.design.themeColor;
             if (newCvData.design.textColorDark) currentData.textColorDark = newCvData.design.textColorDark;

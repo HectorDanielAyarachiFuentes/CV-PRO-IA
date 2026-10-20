@@ -42,7 +42,24 @@
             { id: Date.now() + 10, img: 'https://github.com/HectorDanielAyarachiFuentes/Tu-CV-Pro/blob/main/img/portafolio-img.jpeg?raw=true', title: 'Diseño de App Móvil' },
             { id: Date.now() + 11, img: 'https://github.com/HectorDanielAyarachiFuentes/Tu-CV-Pro/blob/main/img/portafolio-4.png?raw=true', title: 'Branding Corporativo' },
             { id: Date.now() + 12, img: 'https://github.com/HectorDanielAyarachiFuentes/Tu-CV-Pro/blob/main/img/portafolio-3.jpeg?raw=true', title: 'Ilustración Digital' }
-        ]
+        ],
+        coverLetter: {
+            recipientName: 'Equipo de Selección',
+            recipientTitle: 'Gerente de Recursos Humanos',
+            companyName: 'Empresa Innovadora',
+            companyAddress: 'Ciudad, País',
+            date: '',
+            jobTitle: 'Desarrollador de Software',
+            salutation: 'Estimado/a Equipo de Selección,',
+            paragraphs: [
+                'Le escribo con gran entusiasmo para presentar mi candidatura a la posición de Desarrollador de Software en Empresa Innovadora. Tras conocer la visión de su compañía y los desafíos técnicos que impulsan, considero que mi trayectoria profesional y sólida formación se alinean con sus metas.',
+                'A lo largo de mi experiencia, me he especializado en la construcción de arquitecturas robustas, optimización de sistemas y entrega de soluciones de alto impacto. Mi enfoque combina rigurosidad técnica, adaptabilidad ante nuevos desafíos y una colaboración proactiva con equipos multidisciplinarios.',
+                'Agradezco sinceramente su tiempo y consideración al evaluar mi postulación. Quedo a su completa disposición para coordinar una entrevista y profundizar en cómo puedo contribuir de manera inmediata al éxito de sus proyectos.'
+            ],
+            signoff: 'Atentamente,',
+            signature: 'Hector Daniel Ayarachi Fuentes',
+            template: 'modern'
+        }
     };
 
     // Hacemos una copia profunda del estado inicial para poder restaurarlo.

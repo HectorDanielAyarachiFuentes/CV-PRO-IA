@@ -40,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const layout = cvData.layout || 'classic';
         cvPreviewWrapper.dataset.layout = layout;
 
+        if (CvApp.activeDocMode === 'letter') {
+            if (CvApp.coverLetterRenderer && typeof CvApp.coverLetterRenderer.render === 'function') {
+                cvPreviewWrapper.innerHTML = CvApp.coverLetterRenderer.render(cvData);
+            }
+            return;
+        }
+
         if (document.body.classList.contains('fullscreen-preview')) {
             return;
         }
@@ -83,6 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Inicialización del modo de documento ('cv' o 'letter')
+    CvApp.activeDocMode = CvApp.activeDocMode || 'cv';
+
+    const setDocMode = (mode) => {
+        CvApp.activeDocMode = mode;
+        const tabCv = document.getElementById('tab-mode-cv');
+        const tabLetter = document.getElementById('tab-mode-letter');
+        if (tabCv) tabCv.classList.toggle('active', mode === 'cv');
+        if (tabLetter) tabLetter.classList.toggle('active', mode === 'letter');
+        renderCVPreview();
+    };
+    CvApp.setDocMode = setDocMode;
+
     // Exponer renderCVPreview para que los módulos puedan llamarlo
     CvApp.renderCVPreview = renderCVPreview;
 
@@ -90,6 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const setActiveSection = (sectionName) => {
         if (!sectionName) return;
         localStorage.setItem('cvProLastSection', sectionName);
+
+        // Si el usuario entra a la sección de la carta, cambiar vista previa a la carta
+        if (sectionName === 'cover-letter') {
+            setDocMode('letter');
+        } else if (CvApp.activeDocMode === 'letter' && (sectionName === 'design' || sectionName === 'experience' || sectionName === 'skills' || sectionName === 'education')) {
+            // Si el usuario vuelve a secciones puras de CV, regresar la vista previa a CV
+            setDocMode('cv');
+        }
 
         document.querySelectorAll('.editor-nav .nav-item').forEach(item => item.classList.toggle('active', item.getAttribute('href') === `#${sectionName}`));
 
@@ -314,6 +342,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const targetType = target.dataset.bgInputTarget;
                     cvData[`background${targetType.charAt(0).toUpperCase() + targetType.slice(1)}`] = target.value;
                 }
+            },
+            'cover-letter': () => {
+                if (!cvData.coverLetter) cvData.coverLetter = {};
+                if (target.name === 'paragraphs') {
+                    cvData.coverLetter.paragraphs = target.value.split('\n\n').map(p => p.trim()).filter(Boolean);
+                } else if (target.name) {
+                    cvData.coverLetter[target.name] = target.value;
+                }
             }
         };
 
@@ -360,12 +396,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const triggerAiCoverLetterGeneration = () => {
+        const cvData = state.cvData;
+        const letter = cvData.coverLetter || {};
+        const p = cvData.personalInfo || {};
+
+        const chatWindow = document.getElementById('ai-chat-window');
+        const chatInput = document.getElementById('ai-chat-input');
+        const chatSend = document.getElementById('ai-chat-send');
+
+        if (chatWindow && chatWindow.classList.contains('hidden')) {
+            chatWindow.classList.remove('hidden');
+        }
+
+        const comp = letter.companyName ? `en la empresa ${letter.companyName}` : '';
+        const job = letter.jobTitle || p.title || 'mi perfil profesional';
+        const prompt = `Redacta una carta de presentación profesional, convincente y moderna para postular al puesto de ${job} ${comp}. Conecta mi experiencia y habilidades de mi CV con la vacante y resalta el valor que puedo aportar.`;
+
+        if (chatInput) {
+            chatInput.value = prompt;
+            chatInput.focus();
+        }
+
+        if (typeof CvApp.showToast === 'function') {
+            CvApp.showToast("Solicitando a la IA la redacción de tu carta...", "info");
+        }
+
+        if (chatSend) {
+            setTimeout(() => {
+                chatSend.click();
+            }, 180);
+        }
+    };
+    CvApp.triggerAiCoverLetterGeneration = triggerAiCoverLetterGeneration;
+
     const handleFormClick = (e) => {
         const cvData = state.cvData;
         const colorPalettes = state.colorPalettes;
         const loadedIcons = state.loadedIcons;
         const button = e.target.closest('button, .avatar-tab, .icon-option, .layout-card, .color-dot, .gradient-swatch, .gradient-tab, .design-tab, .palette-swatch, .background-target-selector');
         if (!button) return;
+
+        if (button.id === 'ai-generate-letter-btn' || button.closest('#ai-generate-letter-btn')) {
+            e.preventDefault();
+            triggerAiCoverLetterGeneration();
+            return;
+        }
 
         const section = button.dataset.section || button.closest('.form-section')?.dataset.section;
         const action = getActionFromElement(button);
@@ -585,6 +661,16 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggleBtn.addEventListener('click', handleThemeToggle);
         toggleFullscreenBtn.addEventListener('click', handleFullscreenToggle);
         resetCvBtn.addEventListener('click', resetCvData);
+
+        // --- Selector de Modo de Documento: CV vs Carta de Presentación ---
+        const tabCv = document.getElementById('tab-mode-cv');
+        const tabLetter = document.getElementById('tab-mode-letter');
+        if (tabCv) {
+            tabCv.addEventListener('click', () => setDocMode('cv'));
+        }
+        if (tabLetter) {
+            tabLetter.addEventListener('click', () => setDocMode('letter'));
+        }
 
         // --- Historial: botones y teclado ---
         if (undoBtn) {
