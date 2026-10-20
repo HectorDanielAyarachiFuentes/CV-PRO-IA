@@ -229,110 +229,142 @@
         <!-- Panel de Vista Previa (Derecha) -->
         <section class="preview-panel">
             <header class="preview-header">
-                <!-- Botones de Historial (Deshacer/Rehacer) -->
-                <div class="history-btn-group">
-                    <button id="undo-btn" class="btn btn-secondary btn-icon" title="Deshacer (Ctrl+Z)" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 14L4 9l5-5"/>
-                            <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
+                <!-- ZONA IZQUIERDA: Selector de Documento y Controles de Edición del Canvas -->
+                <div class="preview-header-left">
+                    <!-- Segmented Control: CV vs Carta -->
+                    <div class="doc-mode-tabs" id="doc-mode-tabs" role="tablist">
+                        <button id="tab-mode-cv" class="doc-tab-btn active" data-mode="cv" title="Ver y editar Currículum Vitae">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            <span>CV</span>
+                        </button>
+                        <button id="tab-mode-letter" class="doc-tab-btn" data-mode="letter" title="Ver y editar Carta de Presentación">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+                            <span>Carta</span>
+                        </button>
+                    </div>
+
+                    <div class="header-vdivider"></div>
+
+                    <!-- Botones de Historial y Pantalla Completa agrupados -->
+                    <div class="header-btn-cluster">
+                        <button id="undo-btn" class="header-tool-btn" title="Deshacer (Ctrl+Z)" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 14L4 9l5-5"/>
+                                <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
+                            </svg>
+                        </button>
+                        <button id="redo-btn" class="header-tool-btn" title="Rehacer (Ctrl+Y)" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 14l5-5-5-5"/>
+                                <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>
+                            </svg>
+                        </button>
+                        <button id="toggle-fullscreen-btn" class="header-tool-btn" title="Alternar Pantalla Completa (F)">
+                            <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                            </svg>
+                            <svg class="icon-compress" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h6v6m-11 5L21 3m-6 12v6h-6m5-11L3 21" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ZONA DERECHA: Integración IA, Compartir y Exportaciones -->
+                <div class="preview-header-right">
+                    <!-- Configuración API Key IA -->
+                    <button id="ai-apikey-btn" class="header-pill-btn btn-ai-key" title="Configurar tu propia API Key (Google AI Studio, Groq, OpenAI)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="7.5" cy="15.5" r="5.5" />
+                            <path d="m21 2-9.6 9.6" />
+                            <path d="m15.5 7.5 3 3L22 7l-3-3" />
                         </svg>
+                        <span>API Key IA</span>
+                        <span id="ai-key-status-dot" class="key-status-dot" title="Estado de la conexión"></span>
                     </button>
-                    <button id="redo-btn" class="btn btn-secondary btn-icon" title="Rehacer (Ctrl+Y)" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M15 14l5-5-5-5"/>
-                            <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>
+
+                    <!-- Compartir enlace -->
+                    <button id="share-cv-btn" class="header-pill-btn" title="Copiar enlace para compartir">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                            <polyline points="16 6 12 2 8 6" />
+                            <line x1="12" y1="2" x2="12" y2="15" />
                         </svg>
+                        <span>Compartir</span>
+                    </button>
+
+                    <div class="header-vdivider"></div>
+
+                    <!-- Desplegable Exportar (Word, HTML, Typst) -->
+                    <div class="export-dropdown-wrapper" id="export-dropdown-wrapper">
+                        <button id="export-dropdown-btn" class="header-pill-btn export-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Más opciones de descarga">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            <span>Exportar</span>
+                            <svg class="chevron-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                        <div class="export-dropdown-menu" id="export-dropdown-menu">
+                            <div class="dropdown-menu-label">Formatos Editables</div>
+                            
+                            <button id="download-word-btn" class="dropdown-menu-item" type="button" title="Descargar como Word">
+                                <span class="item-icon-box docx-box">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <path d="M8 13l1.5 6 1.5-4 1.5 4 1.5-6" />
+                                    </svg>
+                                </span>
+                                <div class="item-text-group">
+                                    <span class="item-title">Word (.docx / .doc)</span>
+                                    <span class="item-subtitle">Editable en Microsoft Word / Docs</span>
+                                </div>
+                            </button>
+
+                            <button id="download-html-btn" class="dropdown-menu-item" type="button" title="Descargar como HTML">
+                                <span class="item-icon-box html-box">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="16 18 22 12 16 6" />
+                                        <polyline points="8 6 2 12 8 18" />
+                                    </svg>
+                                </span>
+                                <div class="item-text-group">
+                                    <span class="item-title">Página Web HTML</span>
+                                    <span class="item-subtitle">Autónomo con diseño incrustado</span>
+                                </div>
+                            </button>
+
+                            <button id="download-typst-btn" class="dropdown-menu-item" type="button" title="Descargar código Typst">
+                                <span class="item-icon-box typst-box">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                    </svg>
+                                </span>
+                                <div class="item-text-group">
+                                    <span class="item-title">Código Typst (.typ)</span>
+                                    <span class="item-subtitle">Compilador tipográfico de precisión</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Botón Principal: Descargar PDF -->
+                    <button id="download-pdf-btn" class="header-primary-btn" title="Descargar en PDF o Imprimir (Ctrl+P)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        <span>Descargar PDF</span>
                     </button>
                 </div>
-                <!-- Selector de Pestañas: CV vs Carta de Presentación -->
-                <div class="doc-mode-tabs" id="doc-mode-tabs">
-                    <button id="tab-mode-cv" class="doc-tab-btn active" data-mode="cv" title="Ver y editar Currículum Vitae">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                        <span>CV</span>
-                    </button>
-                    <button id="tab-mode-letter" class="doc-tab-btn" data-mode="letter" title="Ver y editar Carta de Presentación">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
-                        <span>Carta</span>
-                    </button>
-                </div>
-                <button id="toggle-fullscreen-btn" class="btn btn-secondary" title="Alternar Pantalla Completa">
-                    <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path class="fill-layer"
-                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                        <path
-                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                    </svg>
-                    <svg class="icon-compress" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path class="fill-layer" d="M15 3h6v6m-11 5L21 3m-6 12v6h-6m5-11L3 21" />
-                        <path d="M15 3h6v6m-11 5L21 3m-6 12v6h-6m5-11L3 21" />
-                    </svg>
-                </button>
-                <button id="ai-apikey-btn" class="btn btn-apikey" title="Configurar tu propia API Key (Google AI Studio, Groq, OpenAI)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="7.5" cy="15.5" r="5.5" />
-                        <path d="m21 2-9.6 9.6" />
-                        <path d="m15.5 7.5 3 3L22 7l-3-3" />
-                    </svg>
-                    <span>API Key IA</span>
-                    <span id="ai-key-status-dot" class="key-status-dot" title="Estado de tu API Key"></span>
-                </button>
-                <button id="share-cv-btn" class="btn btn-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path class="fill-layer" d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                        <polyline class="fill-layer" points="16 6 12 2 8 6" />
-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                        <polyline points="16 6 12 2 8 6" />
-                        <line x1="12" y1="2" x2="12" y2="15" />
-                    </svg>
-                    Compartir
-                </button>
-                <button id="download-html-btn" class="btn btn-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline class="fill-layer" points="16 18 22 12 16 6" />
-                        <polyline class="fill-layer" points="8 6 2 12 8 18" />
-                        <polyline points="16 18 22 12 16 6" />
-                        <polyline points="8 6 2 12 8 18" />
-                    </svg>
-                    Descargar HTML
-                </button>
-                <button id="download-typst-btn" class="btn btn-secondary" title="Exportar código editable Typst (.typ)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    Exportar Typst (.typ)
-                </button>
-                <button id="download-word-btn" class="btn btn-secondary" title="Exportar currículum editable a Word (.docx / .doc)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <path d="M8 13l1.5 6 1.5-4 1.5 4 1.5-6" />
-                    </svg>
-                    Exportar Word (.docx)
-                </button>
-                <button id="download-pdf-btn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path class="fill-layer" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline class="fill-layer" points="7 10 12 15 17 10" />
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    Descargar PDF
-                </button>
             </header>
             <div id="cv-preview-wrapper" spellcheck="false">
                 <!-- El CV se previsualizará aquí -->

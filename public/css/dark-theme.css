@@ -1,4 +1,12 @@
 /* --- Tema Oscuro para el Editor --- */
+[data-editor-theme="dark"] {
+    --color-dark-text: #f1f5f9;
+    --color-muted-text: #94a3b8;
+    --color-border: #334155;
+    --color-light-bg: #1e293b;
+    --color-light-bg-alt: #334155;
+}
+
 [data-editor-theme="dark"] .editor-panel {
     background-color: #212529;
     color: #f8f9fa;

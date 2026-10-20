@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- RENDER CV PREVIEW ---
-    const renderCVPreview = () => {
+    const renderCVPreview = (force = false) => {
         const cvData = state.cvData;
         const themeColor = cvData.themeColor || '#525f7f';
         document.documentElement.style.setProperty('--primary-accent', themeColor);
@@ -44,10 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (CvApp.coverLetterRenderer && typeof CvApp.coverLetterRenderer.render === 'function') {
                 cvPreviewWrapper.innerHTML = CvApp.coverLetterRenderer.render(cvData);
             }
+            if (document.body.classList.contains('fullscreen-preview')) {
+                cvPreviewWrapper.setAttribute('contenteditable', 'true');
+            }
             return;
         }
 
-        if (document.body.classList.contains('fullscreen-preview')) {
+        // En modo pantalla completa solo evitamos pisar el DOM si no se forzó el renderizado
+        if (document.body.classList.contains('fullscreen-preview') && !force) {
             return;
         }
 
@@ -88,18 +92,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainEl.insertAdjacentHTML('beforeend', customHtml);
             }
         }
+
+        if (document.body.classList.contains('fullscreen-preview')) {
+            cvPreviewWrapper.setAttribute('contenteditable', 'true');
+            setTimeout(CvApp.markAvatarClickable, 50);
+        }
     };
 
     // Inicialización del modo de documento ('cv' o 'letter')
     CvApp.activeDocMode = CvApp.activeDocMode || 'cv';
 
     const setDocMode = (mode) => {
+        if (typeof CvApp.syncFromInlinePreview === 'function') {
+            CvApp.syncFromInlinePreview();
+        }
         CvApp.activeDocMode = mode;
         const tabCv = document.getElementById('tab-mode-cv');
         const tabLetter = document.getElementById('tab-mode-letter');
         if (tabCv) tabCv.classList.toggle('active', mode === 'cv');
         if (tabLetter) tabLetter.classList.toggle('active', mode === 'letter');
-        renderCVPreview();
+        renderCVPreview(true);
     };
     CvApp.setDocMode = setDocMode;
 
@@ -250,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isFullscreen) {
             cvPreviewWrapper.setAttribute('contenteditable', 'true');
             CvApp.history.initFsHistory();
+            renderCVPreview(true);
             setTimeout(CvApp.markAvatarClickable, 100);
         } else {
             cvPreviewWrapper.removeAttribute('contenteditable');
@@ -658,6 +671,34 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadWordBtn.addEventListener('click', CvApp.exporter.downloadWord);
         }
         shareCvBtn.addEventListener('click', CvApp.exporter.shareCv);
+
+        // --- Dropdown de Exportación (Word, HTML, Typst) ---
+        const exportDropdownWrapper = document.getElementById('export-dropdown-wrapper');
+        const exportDropdownBtn = document.getElementById('export-dropdown-btn');
+
+        if (exportDropdownBtn && exportDropdownWrapper) {
+            exportDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = exportDropdownWrapper.classList.toggle('open');
+                exportDropdownBtn.setAttribute('aria-expanded', isOpen);
+            });
+
+            // Cerrar menú al hacer clic en cualquiera de las opciones
+            exportDropdownWrapper.querySelectorAll('.dropdown-menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    exportDropdownWrapper.classList.remove('open');
+                    exportDropdownBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            // Cerrar menú al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (!exportDropdownWrapper.contains(e.target)) {
+                    exportDropdownWrapper.classList.remove('open');
+                    exportDropdownBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
         themeToggleBtn.addEventListener('click', handleThemeToggle);
         toggleFullscreenBtn.addEventListener('click', handleFullscreenToggle);
         resetCvBtn.addEventListener('click', resetCvData);
